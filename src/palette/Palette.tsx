@@ -236,6 +236,13 @@ export function Palette({ onClose }: { onClose: () => void }) {
       onClose()
     } else if (event.key === 'Enter') {
       event.preventDefault()
+      // With no query, the Detect strip is the meaningful target —
+      // Enter accepts it instead of the arbitrary first Tool that
+      // happens to sort to the top of the alphabetised list.
+      if (!q && detection) {
+        openDetection(detection)
+        return
+      }
       const r = results[sel]
       if (r) choose(r)
     }
@@ -384,6 +391,7 @@ function DetectStrip({
         <b>Detected:</b> {detection.match.label}
       </span>
       <button type="button" class="btn sm primary" onClick={onOpen}>
+        <span class="kbd">↩</span>
         open in {manifest.name.toLowerCase()}
       </button>
       <span class="palette-detect-from">from clipboard</span>
