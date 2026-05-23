@@ -1,0 +1,37 @@
+/**
+ * Self-hosted font faces.
+ *
+ * Sources are subset variable woff2s under /public/fonts/<family>/,
+ * produced by scripts/subset-fonts.mjs. Latin coverage only.
+ *
+ * Weight ranges reflect what the underlying variable font supports,
+ * not just what the design currently uses — keeps the font correct
+ * if any element requests a weight outside the typical range.
+ *
+ * font-display: swap so layout paints with the fallback while the
+ * woff2 is fetched, then the real glyphs swap in.
+ */
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk/SpaceGrotesk-Variable.subset.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono/JetBrainsMono-Variable.subset.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/archivo/Archivo-Variable.subset.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

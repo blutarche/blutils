@@ -11,7 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "dependencies": {
     "preact": "^10.25.0"
