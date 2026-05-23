@@ -335,6 +335,35 @@
 .diff-grid .del.gut { background: rgba(226, 111, 92, 0.16); color: var(--bad); }
 .diff-grid .empty { background: var(--surface-2); color: var(--muted-2); }
 
+/* Inline character-mode diff. One <pre>-like block with green
+ * additions, red strike-through removals, default-color equals. */
+.diff-inline {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.diff-inline .run-eq { color: var(--ink); }
+.diff-inline .run-add {
+  background: rgba(111, 190, 131, 0.18);
+  color: var(--ok);
+  border-radius: 2px;
+}
+.diff-inline .run-del {
+  background: rgba(226, 111, 92, 0.18);
+  color: var(--bad);
+  text-decoration: line-through;
+  text-decoration-color: rgba(226, 111, 92, 0.55);
+  border-radius: 2px;
+}
+
 /* ─── format.markdown ────────────────────────────────────────── */
 
 .md-prev {
