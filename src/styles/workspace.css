@@ -240,8 +240,12 @@
   color: var(--ink);
 }
 
-.home-wordmark .dot {
-  color: var(--accent);
+/* Brand brackets: `bl` and `.` frame the meaningful word `utils`.
+ * Uses --accent-deep so the brackets read as framing rather than
+ * decoration — the lighter --accent on hover at the sidebar
+ * brand keeps that link feeling interactive. */
+.home-wordmark .bracket {
+  color: var(--accent-deep);
 }
 
 .home-sub {

@@ -34,7 +34,9 @@ export function Sidebar({ activeToolId }: SidebarProps) {
     <aside class="side" aria-label="Tool catalog">
       <Link class="side-brand" href="/" aria-label="Go home">
         <BrandMark />
-        <span class="name">blutils</span>
+        <span class="name">
+          <span class="bracket">bl</span>utils<span class="bracket">.</span>
+        </span>
       </Link>
 
       <div class="side-search">

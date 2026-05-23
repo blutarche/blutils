@@ -12,7 +12,7 @@ export function Home() {
   return (
     <>
       <h1 class="home-wordmark">
-        blutils<span class="dot">.</span>
+        <span class="bracket">bl</span>utils<span class="bracket">.</span>
       </h1>
 
       <p class="home-sub">

@@ -54,7 +54,16 @@
   transition: color 120ms;
 }
 
+.side-brand .name .bracket {
+  color: var(--accent-deep);
+  transition: color 120ms;
+}
+
 .side-brand:hover .name {
+  color: var(--accent);
+}
+
+.side-brand:hover .name .bracket {
   color: var(--accent);
 }
 
