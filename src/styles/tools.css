@@ -125,6 +125,10 @@
   letter-spacing: 0;
 }
 
+/* Panel body — used wherever the body needs framed padding instead
+ * of the flush-edge .area.bare textarea variant. */
+.panel-b { padding: 12px 14px; }
+
 .area {
   width: 100%;
   border: 1px solid var(--line);

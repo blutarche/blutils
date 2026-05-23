@@ -170,6 +170,17 @@
   color: var(--ink);
 }
 
+.btn.sm {
+  height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.btn[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .btn .kbd {
   font-family: var(--font-mono);
   font-size: 10px;
