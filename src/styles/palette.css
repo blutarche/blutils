@@ -103,10 +103,17 @@
 }
 
 /* When the user has navigated into the list, the strip stops
- * being the Enter target but stays as an information chip. We
- * keep the accent-soft background and the colored label — the
- * mode is communicated by the missing ↩ hint and the ghost
- * button, not by greying out the strip itself. */
+ * being the Enter target. We drop the accent-soft background +
+ * the bolded label tint so the strip reads as information
+ * rather than the primary action; the button itself stays
+ * primary so it still looks clickable. Mode delta: missing ↩
+ * hint + transparent background. */
+.palette-detect.is-demoted {
+  background: transparent;
+  color: var(--muted);
+}
+
+.palette-detect.is-demoted b { color: var(--ink-2); }
 
 .palette-detect-from {
   color: var(--muted);

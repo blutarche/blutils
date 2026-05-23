@@ -425,11 +425,7 @@ function DetectStrip({
       <span class="palette-detect-label">
         <b>Detected:</b> {detection.match.label}
       </span>
-      <button
-        type="button"
-        class={`btn sm ${armed ? 'primary' : 'ghost'}`}
-        onClick={onOpen}
-      >
+      <button type="button" class="btn sm primary" onClick={onOpen}>
         {armed && <span class="kbd">↩</span>}
         open in {manifest.name.toLowerCase()}
       </button>
