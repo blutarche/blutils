@@ -3,14 +3,10 @@
  *
  * A small floating panel anchored to the bottom-right of the
  * Workspace, opened from the StatusBar settings segment. Holds
- * the four Tweaks: theme (light/dark), density (compact/regular),
- * showAdvanced (reveals Header mode toggles), and smartHints
- * (enables Palette detectors).
- *
- * rememberInputs (Bucket-C opt-in) is intentionally not exposed
- * here yet — Bucket B (sessionStorage) doesn't have consumers
- * until Phase 5, so the toggle would be misleading. It surfaces
- * with the storage consumers.
+ * the five Tweaks: theme (light/dark), density (compact/regular),
+ * showAdvanced (reveals Header mode toggles), smartHints (enables
+ * Palette detectors), and rememberInputs (mirrors Tool inputs to
+ * localStorage so they survive a tab close — off by default).
  *
  * The panel closes on Esc, backdrop click, or the close button.
  * No drag-handle in this iteration — the prototype's draggable
@@ -61,6 +57,11 @@ export function TweaksPanel({ open, onClose }: TweaksPanelProps) {
             tweakKey="smartHints"
             label="smart hints"
             desc="palette inspects the clipboard on open"
+          />
+          <ToggleRow
+            tweakKey="rememberInputs"
+            label="remember inputs"
+            desc="keep tool inputs across tab close (otherwise this tab only)"
           />
         </div>
       </div>

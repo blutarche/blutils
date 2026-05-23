@@ -26,6 +26,7 @@ import { tools } from '../tools/_registry'
 import { useRouter } from '../router/router'
 import { useTweaks } from '../tweaks/tweaks-context'
 import { clearAllLocal } from '../storage/local'
+import { clearAllSession } from '../storage/session'
 import type { ToolManifest } from '../types'
 
 interface Command {
@@ -114,11 +115,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
           )
           if (!ok) return
           clearAllLocal()
-          try {
-            sessionStorage.clear()
-          } catch {
-            // ignore
-          }
+          clearAllSession()
           window.location.reload()
         },
       },

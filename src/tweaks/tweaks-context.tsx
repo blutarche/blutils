@@ -23,11 +23,16 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'preact/hooks'
 import type { Tweaks } from '../types'
 import { tweaksSlice } from '../storage/schema'
 import { readSlice, writeSlice } from '../storage/local'
+import {
+  clearInputsMirror,
+  snapshotSessionToMirror,
+} from '../storage/inputs-mirror'
 
 interface TweaksContextValue {
   tweaks: Tweaks
@@ -54,6 +59,21 @@ export function TweaksProvider({ children }: { children: ComponentChildren }) {
     applyToDocument(tweaks)
     writeSlice(tweaksSlice, tweaks)
   }, [tweaks])
+
+  // Mirror Tool inputs to localStorage on rememberInputs transitions.
+  // Off → on snapshots any inputs already typed this session so they
+  // survive the next reload. On → off drops the mirror immediately;
+  // sessionStorage stays so the current tab keeps its inputs.
+  const prevRemember = useRef(tweaks.rememberInputs)
+  useEffect(() => {
+    const cur = tweaks.rememberInputs
+    const prev = prevRemember.current
+    if (prev !== cur) {
+      if (cur) snapshotSessionToMirror()
+      else clearInputsMirror()
+    }
+    prevRemember.current = cur
+  }, [tweaks.rememberInputs])
 
   const setTweak = useCallback(
     <K extends keyof Tweaks>(key: K, value: Tweaks[K]) => {
