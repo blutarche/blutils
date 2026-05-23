@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 /**
  * Compile-time globals injected by Vite's `define`.
  *

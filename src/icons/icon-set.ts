@@ -22,6 +22,7 @@ type LucideIcon = FunctionalComponent<
 >
 
 import {
+  Braces,
   GitMerge,
   Plus,
   Search,
@@ -30,6 +31,7 @@ import {
 } from 'lucide-preact'
 
 export const iconSet = {
+  Braces,
   GitMerge,
   Plus,
   Search,
