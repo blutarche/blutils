@@ -18,8 +18,11 @@
     "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "dependencies": {
+    "dompurify": "^3.4.5",
     "lucide-preact": "^1.16.0",
-    "preact": "^10.25.0"
+    "marked": "^18.0.4",
+    "preact": "^10.25.0",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
