@@ -1,0 +1,136 @@
+/**
+ * Design tokens.
+ *
+ * Ported verbatim from the prototype (design/blutils-styles.css).
+ * Dark is the default at :root; light flips via [data-theme="light"]
+ * on <html>. Density flips via [data-density="compact"].
+ *
+ * Two palette layers:
+ *   - workspace tokens (--bg, --surface, --ink, --muted, --accent, …)
+ *     paint the main content area and flip fully with theme.
+ *   - chrome tokens (--chrome-*) paint the Sidebar and Status Bar so
+ *     they always read as "system" surfaces, distinct from the
+ *     workspace even when light mode is active.
+ */
+
+:root {
+  /* Workspace — dark default */
+  --bg:        #0A0A0C;
+  --bg-2:      #121216;
+  --bg-3:      #1A1A20;
+  --bg-4:      #24242C;
+  --surface:   #121216;
+  --surface-2: #1A1A20;
+
+  --line:      #24242C;
+  --line-2:    #34343F;
+  --line-hi:   #43434F;
+
+  --ink:       #F2EFEA;     /* primary text — warm off-white */
+  --ink-2:     #C8C5BD;
+  --muted:     #8C8C94;
+  --muted-2:   #5A5A63;
+  --muted-3:   #3A3A44;
+
+  /* Chrome — sidebar + status bar */
+  --chrome-bg:       #07070A;
+  --chrome-bg-2:     #0E0E14;
+  --chrome-bg-hover: #14141A;
+  --chrome-border:   #18181E;
+  --chrome-border-2: #1F1F26;
+  --chrome-ink:      #E8E5DE;
+  --chrome-ink-2:    #C8C5BD;
+  --chrome-muted:    #8A8A92;
+  --chrome-muted-2:  #5A5A63;
+  --chrome-muted-3:  #38383F;
+  --chrome-muted-4:  #2C2C32;
+
+  /* Accent — muted blue-purple */
+  --accent:        #9084EB;
+  --accent-hi:     #A89FF1;
+  --accent-deep:   #5E54A8;
+  --accent-soft:   rgba(144, 132, 235, 0.10);
+  --accent-bd:     rgba(144, 132, 235, 0.30);
+  --accent-glow:   0 0 24px rgba(144, 132, 235, 0.28);
+
+  /* Status colours */
+  --ok:        #6FBE83;
+  --bad:       #E26F5C;
+  --info:      #8EE0E8;
+  --warn:      #E0B85D;
+
+  --selection: rgba(144, 132, 235, 0.32);
+
+  /* Shadows — used sparingly (palette, toast, overlays) */
+  --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 12px 40px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  /* Radii — intentionally sharp-cornered */
+  --r-0: 0px;
+  --r-1: 2px;
+  --r-2: 4px;
+  --r-3: 6px;
+
+  /* Shell dimensions */
+  --side-w:      240px;
+  --header-h:    46px;
+  --tabs-h:      34px;
+  --statusbar-h: 24px;
+
+  /* Type families */
+  --font:      'Space Grotesk', 'Helvetica Neue', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-disp: 'Archivo', var(--font);
+}
+
+[data-theme="light"] {
+  --bg:        #F4F4F6;
+  --bg-2:      #FFFFFF;
+  --bg-3:      #EAEAED;
+  --bg-4:      #DCDCE0;
+  --surface:   #FFFFFF;
+  --surface-2: #FAFAFC;
+
+  --line:      #DDDDE2;
+  --line-2:    #BFBFC6;
+  --line-hi:   #8E8E96;
+
+  /* Stronger contrast in light — primary near-black */
+  --ink:       #0A0A0C;
+  --ink-2:     #18181D;
+  --muted:     #4A4A52;
+  --muted-2:   #6C6C74;
+  --muted-3:   #9C9CA4;
+
+  --accent:        #5B4FCC;
+  --accent-hi:     #4F44B5;
+  --accent-deep:   #3F356E;
+  --accent-soft:   rgba(91, 79, 204, 0.08);
+  --accent-bd:     rgba(91, 79, 204, 0.32);
+  --accent-glow:   none;
+
+  --shadow-1: 0 1px 0 rgba(15, 15, 20, 0.04);
+  --shadow-2: 0 12px 40px rgba(15, 15, 20, 0.12), 0 2px 6px rgba(15, 15, 20, 0.06);
+
+  --selection: rgba(91, 79, 204, 0.20);
+
+  /* Chrome flips light too but stays distinct from the workspace */
+  --chrome-bg:       #EDEDF0;
+  --chrome-bg-2:     #E4E4E8;
+  --chrome-bg-hover: #DDDDE2;
+  --chrome-border:   #D4D4D9;
+  --chrome-border-2: #DDDDE2;
+  --chrome-ink:      #0A0A0C;
+  --chrome-ink-2:    #18181D;
+  --chrome-muted:    #5E5E66;
+  --chrome-muted-2:  #8C8C94;
+  --chrome-muted-3:  #ACACB2;
+  --chrome-muted-4:  #BEBEC4;
+}
+
+[data-density="compact"] {
+  --header-h:    38px;
+  --tabs-h:      28px;
+  --statusbar-h: 22px;
+  --side-w:      220px;
+}
