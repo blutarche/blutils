@@ -25,12 +25,16 @@ import {
   GitMerge,
   Plus,
   Search,
+  Settings,
+  X,
 } from 'lucide-preact'
 
 export const iconSet = {
   GitMerge,
   Plus,
   Search,
+  Settings,
+  X,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof iconSet

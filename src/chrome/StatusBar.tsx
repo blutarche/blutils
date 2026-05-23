@@ -13,7 +13,11 @@
 
 import { Icon } from '../icons/Icon'
 
-export function StatusBar() {
+export interface StatusBarProps {
+  onOpenTweaks?: () => void
+}
+
+export function StatusBar({ onOpenTweaks }: StatusBarProps) {
   return (
     <footer class="status" aria-label="Status bar">
       <span class="seg ok" title="No data leaves the browser">
@@ -33,6 +37,17 @@ export function StatusBar() {
       <span class="seg" role="button" tabIndex={-1}>
         <Icon name="Plus" size={12} />
         single
+      </span>
+
+      <span
+        class="seg"
+        role="button"
+        tabIndex={0}
+        onClick={onOpenTweaks}
+        aria-label="Open tweaks"
+      >
+        <Icon name="Settings" size={12} />
+        tweaks
       </span>
 
       <span class="seg" role="button" tabIndex={-1}>

@@ -1,0 +1,135 @@
+/**
+ * TweaksPanel styles — a small floating panel for theme,
+ * density, and feature toggles. Opens from the StatusBar
+ * settings segment; closes via Esc or the close button.
+ */
+
+.tweaks-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 50;
+}
+
+.tweaks-panel {
+  position: fixed;
+  right: 14px;
+  bottom: calc(var(--statusbar-h) + 10px);
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-2);
+  z-index: 60;
+  font-family: var(--font);
+}
+
+.tweaks-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tweaks-head .title {
+  flex: 1;
+}
+
+.tweaks-close {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--muted-2);
+  border-radius: var(--r-1);
+  cursor: pointer;
+  transition: color 100ms, background 100ms;
+}
+
+.tweaks-close:hover {
+  color: var(--ink);
+  background: var(--bg-3);
+}
+
+.tweaks-body {
+  padding: 12px 14px 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.tweaks-row {
+  display: grid;
+  gap: 6px;
+}
+
+.tweaks-row > .label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.tweaks-radio-group {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  overflow: hidden;
+  align-self: start;
+}
+
+.tweaks-radio-group button {
+  padding: 5px 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  background: transparent;
+  border-right: 1px solid var(--line);
+  transition: background 100ms, color 100ms;
+}
+
+.tweaks-radio-group button:last-child {
+  border-right: 0;
+}
+
+.tweaks-radio-group button.on {
+  background: var(--bg-3);
+  color: var(--ink);
+}
+
+.tweaks-radio-group button:not(.on):hover {
+  background: var(--bg-3);
+  color: var(--ink);
+}
+
+.tweaks-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+}
+
+.tweaks-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.tweaks-toggle .desc {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--font);
+}

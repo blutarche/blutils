@@ -1,0 +1,19 @@
+/**
+ * App shell grid.
+ *
+ * Three-row, two-column grid: the Sidebar spans all three rows on
+ * the left; the Header, Workspace, and StatusBar stack vertically
+ * on the right.
+ */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--side-w) 1fr;
+  grid-template-rows: var(--header-h) 1fr var(--statusbar-h);
+  grid-template-areas:
+    'side header'
+    'side main'
+    'side status';
+  height: 100%;
+  width: 100%;
+}
