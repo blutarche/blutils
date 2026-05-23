@@ -20,6 +20,7 @@ import { useMemo } from 'preact/hooks'
 import type { JSX } from 'preact'
 import { Icon } from '../../icons/Icon'
 import { useToolInput } from '../../storage/use-tool-input'
+import { highlightRegex } from '../../syntax/regex-syntax'
 
 const FLAGS_ALL = ['g', 'i', 'm', 's', 'u', 'y'] as const
 type Flag = (typeof FLAGS_ALL)[number]
@@ -146,6 +147,10 @@ export default function Tool() {
             /{flags}
           </span>
         </div>
+        <div
+          class="regex-pattern-preview"
+          dangerouslySetInnerHTML={{ __html: highlightRegex(pattern) || '<span style="color:var(--muted-2)">empty pattern</span>' }}
+        />
         {compiled.error && (
           <div class="json-error" style={{ margin: '0 12px 12px' }}>
             {compiled.error}

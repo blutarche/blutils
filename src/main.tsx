@@ -7,6 +7,7 @@ import './styles/chrome.css'
 import './styles/workspace.css'
 import './styles/palette.css'
 import './styles/tools.css'
+import './styles/syntax.css'
 import './styles/tweaks.css'
 import { App } from './app/App'
 

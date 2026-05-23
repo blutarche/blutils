@@ -27,6 +27,7 @@ import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
 import { useToolInput } from '../../storage/use-tool-input'
 import { useSeededState } from './use-seeded-state'
+import { highlightJson } from '../../syntax/highlight'
 
 const SAMPLE_JSON = `{"id":"u_8421","name":"Ada","email":"ada@blutils.dev","plan":"pro","since":"2024-08-14","tags":["beta","admin"],"meta":{"twoFA":true,"lastLogin":1747800000,"devices":[{"os":"macOS","ver":"15.4"},{"os":"iOS","ver":"18.4"}]}}`
 
@@ -59,6 +60,11 @@ export default function Tool({ initialState }: ToolProps) {
     if (!parsed.ok) return null
     return computeStats(parsed.value, input, output)
   }, [parsed, input, output])
+
+  const highlightedOutput = useMemo(
+    () => (parsed.ok ? highlightJson(output) : ''),
+    [parsed.ok, output],
+  )
 
   const copyOutput = () => {
     if (!parsed.ok) return
@@ -165,12 +171,9 @@ export default function Tool({ initialState }: ToolProps) {
             </span>
           </div>
           {parsed.ok ? (
-            <textarea
-              readOnly
-              class="area bare"
-              value={output}
-              spellcheck={false}
-              style={{ minHeight: 360 }}
+            <pre
+              class="hl-block"
+              dangerouslySetInnerHTML={{ __html: highlightedOutput }}
             />
           ) : (
             <div style={{ padding: 14 }}>

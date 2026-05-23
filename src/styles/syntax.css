@@ -1,0 +1,106 @@
+/* Syntax token colors.
+ *
+ * Used by every syntax-highlighted block — format.json output,
+ * markdown code fences, regex pattern preview. Colors map to
+ * existing design tokens so a theme flip is automatic.
+ */
+
+:root {
+  --tok-key:     var(--info);
+  --tok-string:  var(--ok);
+  --tok-number:  #d49a6a;
+  --tok-bool:    var(--accent);
+  --tok-keyword: var(--accent-hi);
+  --tok-comment: var(--muted-2);
+  --tok-punct:   var(--muted);
+  --tok-var:     var(--info);
+  --tok-class:   #d49a6a;
+  --tok-group:   var(--accent-hi);
+  --tok-quant:   #d49a6a;
+  --tok-anchor:  var(--bad);
+  --tok-alt:     var(--accent);
+  --tok-escape:  var(--info);
+}
+
+[data-theme='light'] {
+  --tok-number:  #b7681f;
+  --tok-class:   #b7681f;
+  --tok-quant:   #b7681f;
+}
+
+.tok-key      { color: var(--tok-key); }
+.tok-string   { color: var(--tok-string); }
+.tok-number   { color: var(--tok-number); }
+.tok-bool     { color: var(--tok-bool); }
+.tok-keyword  { color: var(--tok-keyword); }
+.tok-comment  { color: var(--tok-comment); font-style: italic; }
+.tok-punct    { color: var(--tok-punct); }
+.tok-var      { color: var(--tok-var); }
+.tok-class    { color: var(--tok-class); }
+.tok-group    { color: var(--tok-group); }
+.tok-quant    { color: var(--tok-quant); }
+.tok-anchor   { color: var(--tok-anchor); font-weight: 600; }
+.tok-alt      { color: var(--tok-alt); font-weight: 600; }
+.tok-escape   { color: var(--tok-escape); }
+
+/* Prism token theme — maps Prism's class names onto the same
+ * --tok-* tokens used by our hand-rolled JSON/regex highlighters
+ * so every highlighted surface shares one palette and one theme
+ * flip. Applies inside markdown code blocks only; the .md-prev
+ * scope keeps these rules from leaking elsewhere. */
+.md-prev .token.comment,
+.md-prev .token.prolog,
+.md-prev .token.cdata        { color: var(--tok-comment); font-style: italic; }
+.md-prev .token.punctuation  { color: var(--tok-punct); }
+.md-prev .token.property,
+.md-prev .token.tag,
+.md-prev .token.constant,
+.md-prev .token.symbol,
+.md-prev .token.deleted      { color: var(--tok-key); }
+.md-prev .token.boolean,
+.md-prev .token.null,
+.md-prev .token.number       { color: var(--tok-number); }
+.md-prev .token.selector,
+.md-prev .token.attr-name,
+.md-prev .token.string,
+.md-prev .token.char,
+.md-prev .token.builtin,
+.md-prev .token.url,
+.md-prev .token.inserted     { color: var(--tok-string); }
+.md-prev .token.operator,
+.md-prev .token.entity,
+.md-prev .token.atrule,
+.md-prev .token.attr-value   { color: var(--tok-escape); }
+.md-prev .token.keyword,
+.md-prev .token.important,
+.md-prev .token.function,
+.md-prev .token.class-name   { color: var(--tok-keyword); }
+.md-prev .token.regex,
+.md-prev .token.variable     { color: var(--tok-var); }
+.md-prev .token.bold         { font-weight: 600; }
+.md-prev .token.italic       { font-style: italic; }
+
+/* Highlighted output blocks (read-only `pre` versions of textareas) */
+.hl-block {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: auto;
+  min-height: 360px;
+}
+
+/* Regex pattern preview strip — sits beside or below the input. */
+.regex-pattern-preview {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  padding: 6px 10px;
+  margin-top: 6px;
+  border-top: 1px dashed var(--line);
+  word-break: break-all;
+}
