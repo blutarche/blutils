@@ -7,8 +7,10 @@
  * the Sidebar, Palette, router, and prerender can enumerate the
  * catalog without loading any Tool component.
  *
- * Tool components (Tool.tsx) are deliberately not loaded here —
- * the router (Phase 3) glob-loads them lazily.
+ * Tool components (Tool.tsx) are also globbed, but **lazily** —
+ * each entry maps to a Suspense-aware component that loads its
+ * chunk only when the route opens. The shell bundle stays
+ * independent of the Tool count.
  *
  * Validation runs at module load. Any of the following breaks
  * the build:
@@ -16,12 +18,11 @@
  *   - duplicate <category>/<slug> URL (including aliases)
  *   - unknown category
  *   - missing `manifest` export
- *
- * The error throws happen at import time, so a malformed Tool
- * fails the build with a clear message instead of silently
- * shadowing another Tool.
+ *   - missing matching Tool.tsx for a manifest's folder
  */
 
+import { lazy } from 'preact/compat'
+import type { ComponentType } from 'preact'
 import type { CategoryId, ToolManifest } from '../types'
 import { categories, hasCategory } from '../categories'
 
@@ -29,13 +30,31 @@ interface ManifestModule {
   manifest: ToolManifest
 }
 
+interface ToolModule {
+  default: ComponentType<Record<string, never>>
+}
+
 const manifestModules = import.meta.glob<ManifestModule>(
   './*/manifest.ts',
   { eager: true },
 )
 
-function loadManifests(): ToolManifest[] {
-  const list: ToolManifest[] = []
+const componentModules = import.meta.glob<ToolModule>('./*/Tool.tsx')
+
+function folderFromPath(path: string): string | null {
+  const m = path.match(/^\.\/([^/]+)\/(?:manifest\.ts|Tool\.tsx)$/)
+  return m ? m[1]! : null
+}
+
+interface RegisteredTool {
+  manifest: ToolManifest
+  folder: string
+  /** Lazy Tool component. Suspense awaits its chunk on first render. */
+  Component: ComponentType<Record<string, never>>
+}
+
+function loadRegistry(): RegisteredTool[] {
+  const out: RegisteredTool[] = []
   const idSet = new Set<string>()
   const urlSet = new Set<string>()
 
@@ -70,19 +89,46 @@ function loadManifests(): ToolManifest[] {
       urlSet.add(aurl)
     }
 
-    list.push(m)
+    const folder = folderFromPath(path)
+    if (!folder) {
+      throw new Error(`Tool "${m.id}": cannot parse folder from ${path}`)
+    }
+
+    const componentPath = `./${folder}/Tool.tsx`
+    const loader = componentModules[componentPath]
+    if (!loader) {
+      throw new Error(
+        `Tool "${m.id}": missing component at ${componentPath}`,
+      )
+    }
+
+    out.push({
+      manifest: m,
+      folder,
+      Component: lazy(loader),
+    })
   }
 
-  return list
+  return out
 }
 
-/** Frozen flat list of every registered Tool, in glob order. */
-export const tools: readonly ToolManifest[] = Object.freeze(loadManifests())
+const registry = loadRegistry()
+
+/** Frozen flat list of every registered Tool manifest, in glob order. */
+export const tools: readonly ToolManifest[] = Object.freeze(
+  registry.map((r) => r.manifest),
+)
 
 /** Map from Tool id to manifest. */
-export const toolById = new Map<string, ToolManifest>(
-  tools.map((m) => [m.id, m]),
+export const toolById: ReadonlyMap<string, ToolManifest> = new Map(
+  registry.map((r) => [r.manifest.id, r.manifest]),
 )
+
+/** Map from Tool id to its lazy component. Used by the router. */
+export const componentById: ReadonlyMap<
+  string,
+  ComponentType<Record<string, never>>
+> = new Map(registry.map((r) => [r.manifest.id, r.Component]))
 
 export interface CategorySection {
   category: CategoryId
@@ -92,12 +138,10 @@ export interface CategorySection {
 }
 
 /**
- * Tools grouped by their Category, in the curated Category
- * display order from src/categories.ts. Within each Category,
- * Tools sort alphabetically by name with `experimental` Tools
- * sunk to the bottom.
- *
- * Categories with zero Tools are omitted.
+ * Tools grouped by Category, in the curated Category display
+ * order from src/categories.ts. Within each Category, Tools sort
+ * alphabetically by name with `experimental` Tools sunk to the
+ * bottom. Categories with zero Tools are omitted.
  */
 export function toolsByCategory(): CategorySection[] {
   const grouped = new Map<CategoryId, ToolManifest[]>()

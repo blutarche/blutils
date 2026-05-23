@@ -7,32 +7,35 @@
  * registered, a single "tools" section header with an empty
  * placeholder is rendered.
  *
- * Phase 2: items are anchors with href set to the Tool URL, but
- * navigation is suppressed (preventDefault) because the router
- * lands in Phase 3. The Tool component itself does not render
- * yet — this commit only proves the catalog → Sidebar pipeline.
+ * Items use the router's <Link> so navigation stays SPA-internal;
+ * the active Tool is highlighted via .on which also paints the
+ * 2 px accent rail on the item's left edge.
  */
 
 import type { ToolManifest } from '../types'
 import { tools, toolsByCategory, type CategorySection } from '../tools/_registry'
 import { Icon } from '../icons/Icon'
-import type { IconName } from '../icons/icon-set'
-import { isIconName } from '../icons/icon-set'
+import { isIconName, type IconName } from '../icons/icon-set'
+import { Link } from '../router/router'
 import { BrandMark } from './BrandMark'
 import { GithubMark } from './GithubMark'
 
 const VERSION = `v${__APP_VERSION__}`
 
-export function Sidebar() {
+export interface SidebarProps {
+  activeToolId?: string
+}
+
+export function Sidebar({ activeToolId }: SidebarProps) {
   const sections = toolsByCategory()
   const empty = tools.length === 0
 
   return (
     <aside class="side" aria-label="Tool catalog">
-      <div class="side-brand">
+      <Link class="side-brand" href="/" aria-label="Go home">
         <BrandMark />
         <span class="name">blutils</span>
-      </div>
+      </Link>
 
       <div class="side-search">
         <span class="ico">
@@ -56,7 +59,9 @@ export function Sidebar() {
             </p>
           </>
         ) : (
-          sections.map((s) => <Section key={s.category} section={s} />)
+          sections.map((s) => (
+            <Section key={s.category} section={s} activeToolId={activeToolId} />
+          ))
         )}
       </div>
 
@@ -78,12 +83,18 @@ export function Sidebar() {
   )
 }
 
-function Section({ section }: { section: CategorySection }) {
+function Section({
+  section,
+  activeToolId,
+}: {
+  section: CategorySection
+  activeToolId?: string
+}) {
   return (
     <>
       <SectionHeader name={section.name} count={section.tools.length} />
       {section.tools.map((m) => (
-        <ToolItem key={m.id} manifest={m} />
+        <ToolItem key={m.id} manifest={m} active={m.id === activeToolId} />
       ))}
     </>
   )
@@ -98,21 +109,26 @@ function SectionHeader({ name, count }: { name: string; count: number }) {
   )
 }
 
-function ToolItem({ manifest }: { manifest: ToolManifest }) {
+function ToolItem({
+  manifest,
+  active,
+}: {
+  manifest: ToolManifest
+  active: boolean
+}) {
   const iconName: IconName = isIconName(manifest.icon)
     ? manifest.icon
-    : ('Search' satisfies IconName) // fallback — registry sweep will tighten this in a later phase
+    : 'Search'
   return (
-    <a
-      class="side-item"
+    <Link
+      class={`side-item${active ? ' on' : ''}`}
       href={`/${manifest.category}/${manifest.slug}`}
-      onClick={(e) => e.preventDefault()}
       title={manifest.description}
     >
       <span class="ic">
         <Icon name={iconName} size={14} />
       </span>
       <span class="label">{manifest.name.toLowerCase()}</span>
-    </a>
+    </Link>
   )
 }

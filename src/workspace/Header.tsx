@@ -8,11 +8,13 @@
  * uncluttered for first-time users.
  *
  * The breadcrumb shape is `blutils / <context>` where the context
- * is the active Tool's title (dot-cased) or `home` / `chain`.
+ * is the active Tool's title (dot-cased) or `home` / `chain` /
+ * `not-found`.
  */
 
 import { useTweaks } from '../tweaks/tweaks-context'
 import { Icon } from '../icons/Icon'
+import { Link } from '../router/router'
 
 export interface HeaderProps {
   /** Active context label rendered after the home-tag separator. */
@@ -25,7 +27,9 @@ export function Header({ context = 'home' }: HeaderProps) {
   return (
     <header class="header">
       <span class="crumb">
-        <span class="home-tag">blutils</span>
+        <Link class="home-tag" href="/">
+          blutils
+        </Link>
         <span class="sep">/</span>
         <b>{context}</b>
       </span>

@@ -14,10 +14,11 @@
 import { Icon } from '../icons/Icon'
 
 export interface StatusBarProps {
+  contextLabel?: string
   onOpenTweaks?: () => void
 }
 
-export function StatusBar({ onOpenTweaks }: StatusBarProps) {
+export function StatusBar({ contextLabel = 'home', onOpenTweaks }: StatusBarProps) {
   return (
     <footer class="status" aria-label="Status bar">
       <span class="seg ok" title="No data leaves the browser">
@@ -25,7 +26,7 @@ export function StatusBar({ onOpenTweaks }: StatusBarProps) {
         local
       </span>
 
-      <span class="seg seg-tool">home</span>
+      <span class="seg seg-tool">{contextLabel}</span>
 
       <span class="spacer" />
 

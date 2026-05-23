@@ -192,6 +192,31 @@
   color: var(--muted);
 }
 
+/* ─── Route placeholders + loading ────────────────────────── */
+
+.route-loading {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.route-heading {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.route-copy {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 /* ─── Home screen ─────────────────────────────────────────── */
 
 .home-wordmark {
