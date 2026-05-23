@@ -35,3 +35,9 @@ coverage/
 # Font source downloads (re-downloaded by scripts/subset-fonts.mjs;
 # only the subset outputs under public/fonts/ are committed)
 fonts-source/
+
+# Design prototype — local reference only. The production code in
+# src/ is the authoritative implementation; the prototype is kept
+# on disk for the maintainer to compare against, not shipped with
+# the repo.
+design/
