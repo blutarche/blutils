@@ -1,0 +1,181 @@
+/* Shared Tool surface controls.
+ *
+ * Every Tool composes from these primitives — head row, sub copy,
+ * the two-column input/output panels, the segmented indent
+ * control, status chips, and the few Tool-specific accents (json
+ * error block, json stats row, hash row). The Tool body never
+ * reaches for raw colours — it leans on the tokens and these
+ * shared classes so theme + density flips travel everywhere.
+ */
+
+.tool-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  flex-wrap: wrap;
+}
+
+.tool-head h1 {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.tool-sub {
+  color: var(--muted);
+  margin: 0 0 22px;
+  font-size: 13px;
+  max-width: 72ch;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+/* Segmented control — used for indent variants, chart period
+ * pickers, etc. Filled bar of buttons in a single 28px row. */
+.seg-ctrl {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--surface);
+  overflow: hidden;
+  height: 28px;
+}
+
+.seg-ctrl button {
+  border: 0;
+  background: transparent;
+  padding: 0 10px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  cursor: default;
+  border-right: 1px solid var(--line);
+  transition: background 120ms, color 120ms;
+}
+
+.seg-ctrl button:last-child { border-right: 0; }
+.seg-ctrl button.on { background: var(--bg-3); color: var(--ink); }
+.seg-ctrl button:hover:not(.on) { background: var(--bg-3); color: var(--ink-2); }
+
+/* Status / metadata chips. Default neutral; the .ok / .bad / .info
+ * / .accent modifiers tint border + background to match the
+ * status palette. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.chip.ok   { color: var(--ok);   border-color: rgba(111, 190, 131, 0.40); background: rgba(111, 190, 131, 0.06); }
+.chip.bad  { color: var(--bad);  border-color: rgba(226, 111,  92, 0.40); background: rgba(226, 111,  92, 0.06); }
+.chip.info { color: var(--info); border-color: rgba(142, 224, 232, 0.40); background: rgba(142, 224, 232, 0.06); }
+.chip.accent {
+  color: var(--accent-hi);
+  border-color: var(--accent-bd);
+  background: var(--accent-soft);
+}
+
+/* Input / output panels.
+ *
+ * .panel is the framed container; .panel-h is the uppercase header
+ * bar with optional .actions cluster on the right; .area is the
+ * monospace textarea variant that sits inside (.area.bare drops
+ * the border and lets the panel frame do the visual work). */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  overflow: hidden;
+}
+
+.panel-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  height: 34px;
+}
+
+.panel-h .actions {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.area {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--r-2);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  outline: none;
+  resize: none;
+  min-height: 200px;
+}
+
+.area:focus { border-color: var(--accent-bd); }
+
+.area.bare {
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  padding: 12px 14px;
+}
+
+/* Two-column layout — input on the left, output on the right.
+ * Collapses to a single column under 1100 px per the responsive
+ * decision in the plan. */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 1100px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* ─── Tool-specific accents ──────────────────────────────────── */
+
+.json-stats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.json-error {
+  border-left: 2px solid var(--bad);
+  background: rgba(226, 111, 92, 0.06);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--bad);
+  border-radius: 0 var(--r-1) var(--r-1) 0;
+}

@@ -81,7 +81,7 @@ function RouteView({ match }: { match: RouteMatch }) {
       if (!Component) return <NotFound />
       return (
         <Suspense fallback={<p class="route-loading">loading…</p>}>
-          <Component />
+          <Component initialState={match.initialState} />
         </Suspense>
       )
     }

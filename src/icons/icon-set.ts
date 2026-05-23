@@ -23,6 +23,8 @@ type LucideIcon = FunctionalComponent<
 
 import {
   Braces,
+  Check,
+  Copy,
   GitMerge,
   Plus,
   Search,
@@ -32,6 +34,8 @@ import {
 
 export const iconSet = {
   Braces,
+  Check,
+  Copy,
   GitMerge,
   Plus,
   Search,

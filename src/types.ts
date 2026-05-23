@@ -75,6 +75,17 @@ export interface ToolAlias {
   initialState?: Record<string, unknown>
 }
 
+/**
+ * Props passed to every lazy Tool component by the router.
+ *
+ * `initialState` is the alias-declared seed (see ToolAlias above)
+ * when the active route is an alias, otherwise undefined. Tools
+ * interpret its keys themselves — there's no shared schema.
+ */
+export interface ToolProps {
+  initialState?: Record<string, unknown>
+}
+
 export interface DetectorMatch {
   /** 0..1. Highest match across all Detectors wins. */
   confidence: number

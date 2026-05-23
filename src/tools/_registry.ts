@@ -23,7 +23,7 @@
 
 import { lazy } from 'preact/compat'
 import type { ComponentType } from 'preact'
-import type { CategoryId, ToolManifest } from '../types'
+import type { CategoryId, ToolManifest, ToolProps } from '../types'
 import { categories, hasCategory } from '../categories'
 
 interface ManifestModule {
@@ -31,7 +31,7 @@ interface ManifestModule {
 }
 
 interface ToolModule {
-  default: ComponentType<Record<string, never>>
+  default: ComponentType<ToolProps>
 }
 
 const manifestModules = import.meta.glob<ManifestModule>(
@@ -50,7 +50,7 @@ interface RegisteredTool {
   manifest: ToolManifest
   folder: string
   /** Lazy Tool component. Suspense awaits its chunk on first render. */
-  Component: ComponentType<Record<string, never>>
+  Component: ComponentType<ToolProps>
 }
 
 function loadRegistry(): RegisteredTool[] {
@@ -127,7 +127,7 @@ export const toolById: ReadonlyMap<string, ToolManifest> = new Map(
 /** Map from Tool id to its lazy component. Used by the router. */
 export const componentById: ReadonlyMap<
   string,
-  ComponentType<Record<string, never>>
+  ComponentType<ToolProps>
 > = new Map(registry.map((r) => [r.manifest.id, r.Component]))
 
 export interface CategorySection {
