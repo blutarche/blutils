@@ -16,12 +16,16 @@ export interface StatusBarProps {
   contextLabel?: string
   onOpenTweaks?: () => void
   onOpenPalette?: () => void
+  tabsEnabled?: boolean
+  onToggleTabs?: () => void
 }
 
 export function StatusBar({
   contextLabel = 'home',
   onOpenTweaks,
   onOpenPalette,
+  tabsEnabled = false,
+  onToggleTabs,
 }: StatusBarProps) {
   return (
     <footer class="status" aria-label="Status bar">
@@ -39,9 +43,16 @@ export function StatusBar({
         chain
       </span>
 
-      <span class="seg" role="button" tabIndex={-1}>
+      <span
+        class={`seg ${tabsEnabled ? 'on' : ''}`}
+        role="button"
+        tabIndex={0}
+        onClick={onToggleTabs}
+        aria-label={tabsEnabled ? 'Disable Multi-Tab Mode' : 'Enable Multi-Tab Mode'}
+        aria-pressed={tabsEnabled}
+      >
         <Icon name="Plus" size={12} />
-        single
+        {tabsEnabled ? 'tabs' : 'single'}
       </span>
 
       <span

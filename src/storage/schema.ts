@@ -62,3 +62,48 @@ export const tweaksSlice: Slice<Tweaks> = {
 
 /** Namespace prefix for the `Clear all data` Command to wipe. */
 export const STORAGE_NAMESPACE = `${NS}:`
+
+export interface TabRecord {
+  /** Stable id, generated when the tab opens. */
+  id: string
+  /** Pathname the tab is currently showing. */
+  path: string
+}
+
+export interface TabsSliceShape {
+  /** Multi-Tab Mode toggle. When false, the rest is dormant. */
+  enabled: boolean
+  /** Open tabs in display order. */
+  tabs: TabRecord[]
+  /** Id of the active tab. null when tabs is empty. */
+  activeId: string | null
+}
+
+export const tabsSlice: Slice<TabsSliceShape> = {
+  key: `${NS}:tabs:v1`,
+  defaults: {
+    enabled: false,
+    tabs: [],
+    activeId: null,
+  },
+  parse(raw) {
+    if (!raw || typeof raw !== 'object') return null
+    const r = raw as Record<string, unknown>
+    if (typeof r.enabled !== 'boolean') return null
+    if (!Array.isArray(r.tabs)) return null
+    const tabs: TabRecord[] = []
+    for (const t of r.tabs) {
+      if (!t || typeof t !== 'object') return null
+      const rec = t as Record<string, unknown>
+      if (typeof rec.id !== 'string' || typeof rec.path !== 'string') return null
+      tabs.push({ id: rec.id, path: rec.path })
+    }
+    const activeId =
+      r.activeId === null
+        ? null
+        : typeof r.activeId === 'string'
+          ? r.activeId
+          : null
+    return { enabled: r.enabled, tabs, activeId }
+  },
+}

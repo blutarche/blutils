@@ -17,3 +17,15 @@
   height: 100%;
   width: 100%;
 }
+
+/* Multi-Tab Mode inserts a tab strip between header and main. */
+.app.with-tabs {
+  grid-template-rows: var(--header-h) var(--tabs-h) 1fr var(--statusbar-h);
+  grid-template-areas:
+    'side header'
+    'side tabs'
+    'side main'
+    'side status';
+}
+
+.app.with-tabs .tabs-bar { grid-area: tabs; }

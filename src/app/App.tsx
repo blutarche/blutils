@@ -23,6 +23,8 @@ import { RouterProvider, useRouter } from '../router/router'
 import { matchRoute, type RouteMatch } from '../router/match'
 import { componentById } from '../tools/_registry'
 import { PaletteProvider, usePalette } from '../palette/palette-context'
+import { TabsProvider, useTabs } from '../tabs/tabs-context'
+import { TabsBar } from '../tabs/TabsBar'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -33,9 +35,11 @@ export function App({ initialPath }: AppProps) {
   return (
     <TweaksProvider>
       <RouterProvider initialPath={initialPath}>
-        <PaletteProvider>
-          <Shell />
-        </PaletteProvider>
+        <TabsProvider>
+          <PaletteProvider>
+            <Shell />
+          </PaletteProvider>
+        </TabsProvider>
       </RouterProvider>
     </TweaksProvider>
   )
@@ -46,6 +50,7 @@ function Shell() {
   const match = useMemo(() => matchRoute(pathname), [pathname])
   const [tweaksOpen, setTweaksOpen] = useState(false)
   const palette = usePalette()
+  const tabs = useTabs()
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -56,9 +61,10 @@ function Shell() {
   const activeToolId = match.type === 'tool' ? match.manifest.id : undefined
 
   return (
-    <div class="app">
+    <div class={`app ${tabs.enabled ? 'with-tabs' : ''}`}>
       <Sidebar activeToolId={activeToolId} />
       <Header context={contextLabelFor(match)} />
+      {tabs.enabled && <TabsBar />}
       <Workspace>
         <RouteView match={match} />
       </Workspace>
@@ -66,6 +72,8 @@ function Shell() {
         contextLabel={statusLabelFor(match)}
         onOpenTweaks={() => setTweaksOpen(true)}
         onOpenPalette={palette.open}
+        tabsEnabled={tabs.enabled}
+        onToggleTabs={() => tabs.setEnabled(!tabs.enabled)}
       />
       <TweaksPanel open={tweaksOpen} onClose={() => setTweaksOpen(false)} />
     </div>
