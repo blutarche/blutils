@@ -23,10 +23,15 @@ import { RouterProvider, useRouter } from '../router/router'
 import { matchRoute, type RouteMatch } from '../router/match'
 import { componentById } from '../tools/_registry'
 
-export function App() {
+export interface AppProps {
+  /** Initial pathname for SSR/prerender. Client ignores this. */
+  initialPath?: string
+}
+
+export function App({ initialPath }: AppProps) {
   return (
     <TweaksProvider>
-      <RouterProvider>
+      <RouterProvider initialPath={initialPath}>
         <Shell />
       </RouterProvider>
     </TweaksProvider>

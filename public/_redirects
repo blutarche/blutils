@@ -1,0 +1,7 @@
+# Cloudflare Pages SPA fallback.
+#
+# Static files (prerendered HTML, CSS, JS, fonts) take priority;
+# this rule only catches unknown paths. The 200 status code makes
+# CF Pages rewrite the URL to /index.html without redirecting,
+# so the client router can handle the (eventually NotFound) route.
+/*    /index.html    200

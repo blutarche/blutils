@@ -30,10 +30,21 @@ interface RouterValue {
 
 const RouterContext = createContext<RouterValue | null>(null)
 
-export function RouterProvider({ children }: { children: ComponentChildren }) {
-  const [pathname, setPathname] = useState<string>(() =>
-    typeof window === 'undefined' ? '/' : window.location.pathname,
-  )
+export interface RouterProviderProps {
+  children: ComponentChildren
+  /**
+   * Initial pathname. Required during SSR/prerender (where
+   * `window` does not exist) and ignored at runtime — the
+   * client always reads from `window.location.pathname`.
+   */
+  initialPath?: string
+}
+
+export function RouterProvider({ children, initialPath }: RouterProviderProps) {
+  const [pathname, setPathname] = useState<string>(() => {
+    if (initialPath !== undefined) return initialPath
+    return typeof window === 'undefined' ? '/' : window.location.pathname
+  })
 
   useEffect(() => {
     const onPopState = () => setPathname(window.location.pathname)
