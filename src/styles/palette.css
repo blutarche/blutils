@@ -1,0 +1,165 @@
+/* Command palette — modal dialog over the App shell.
+ *
+ * Sized like Spotlight / VSCode (600px max, 12vh from top), keeps
+ * an internal max-height so long result lists scroll inside the
+ * panel rather than the viewport. Animation is 140ms drop-in with
+ * a subtle backdrop fade — kept short because the palette is the
+ * most frequently opened surface in the app.
+ */
+
+.palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.6);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding-top: 12vh;
+  animation: pal-bd 120ms ease-out;
+}
+
+[data-theme='light'] .palette-backdrop {
+  background: rgba(15, 15, 20, 0.32);
+}
+
+@keyframes pal-bd {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.palette {
+  width: 600px;
+  max-width: calc(100vw - 32px);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  animation: pal-in 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes pal-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.palette-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.palette-input-row input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.palette-input-row input::placeholder {
+  color: var(--muted-2);
+}
+
+.palette-input-icon {
+  color: var(--muted);
+  display: inline-flex;
+}
+
+.palette-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.palette-empty {
+  padding: 30px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.pal-section {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  padding: 12px 12px 4px;
+}
+
+.pal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--r-2);
+  cursor: default;
+}
+
+.pal-item.on {
+  background: var(--bg-3);
+}
+
+.pal-item .ic {
+  width: 18px;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+}
+
+.pal-item.on .ic {
+  color: var(--accent);
+}
+
+.pal-item .name {
+  font-size: 13px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+}
+
+.pal-item .name mark {
+  background: var(--accent-soft);
+  color: var(--accent-hi);
+  padding: 0;
+}
+
+.pal-item .desc {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-foot {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.palette-foot .spacer { flex: 1; }
+
+.palette-foot .seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

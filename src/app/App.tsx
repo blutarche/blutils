@@ -22,6 +22,7 @@ import { TweaksPanel } from '../tweaks/TweaksPanel'
 import { RouterProvider, useRouter } from '../router/router'
 import { matchRoute, type RouteMatch } from '../router/match'
 import { componentById } from '../tools/_registry'
+import { PaletteProvider, usePalette } from '../palette/palette-context'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -32,7 +33,9 @@ export function App({ initialPath }: AppProps) {
   return (
     <TweaksProvider>
       <RouterProvider initialPath={initialPath}>
-        <Shell />
+        <PaletteProvider>
+          <Shell />
+        </PaletteProvider>
       </RouterProvider>
     </TweaksProvider>
   )
@@ -42,6 +45,7 @@ function Shell() {
   const { pathname } = useRouter()
   const match = useMemo(() => matchRoute(pathname), [pathname])
   const [tweaksOpen, setTweaksOpen] = useState(false)
+  const palette = usePalette()
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -61,6 +65,7 @@ function Shell() {
       <StatusBar
         contextLabel={statusLabelFor(match)}
         onOpenTweaks={() => setTweaksOpen(true)}
+        onOpenPalette={palette.open}
       />
       <TweaksPanel open={tweaksOpen} onClose={() => setTweaksOpen(false)} />
     </div>

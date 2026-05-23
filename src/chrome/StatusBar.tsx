@@ -6,9 +6,8 @@
  * current context ("home" by default), and the right-aligned
  * cluster of mode segments (Chain, Tabs, Palette).
  *
- * Segments are not yet interactive — wiring up Chain toggle,
- * Multi-Tab toggle, and Palette open lands with the Palette
- * (Phase 4) and Tabs / Chain phases.
+ * The Palette segment opens the Command Palette; Chain and Tabs
+ * segments are still placeholders pending Phases 8 and 9.
  */
 
 import { Icon } from '../icons/Icon'
@@ -16,9 +15,14 @@ import { Icon } from '../icons/Icon'
 export interface StatusBarProps {
   contextLabel?: string
   onOpenTweaks?: () => void
+  onOpenPalette?: () => void
 }
 
-export function StatusBar({ contextLabel = 'home', onOpenTweaks }: StatusBarProps) {
+export function StatusBar({
+  contextLabel = 'home',
+  onOpenTweaks,
+  onOpenPalette,
+}: StatusBarProps) {
   return (
     <footer class="status" aria-label="Status bar">
       <span class="seg ok" title="No data leaves the browser">
@@ -51,7 +55,13 @@ export function StatusBar({ contextLabel = 'home', onOpenTweaks }: StatusBarProp
         tweaks
       </span>
 
-      <span class="seg" role="button" tabIndex={-1}>
+      <span
+        class="seg"
+        role="button"
+        tabIndex={0}
+        onClick={onOpenPalette}
+        aria-label="Open command palette"
+      >
         <kbd>⌘K</kbd>
         palette
       </span>
