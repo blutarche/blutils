@@ -102,13 +102,11 @@
   white-space: nowrap;
 }
 
-.palette-detect.is-demoted {
-  background: transparent;
-  border-bottom: 1px solid var(--line);
-  color: var(--muted);
-}
-
-.palette-detect.is-demoted b { color: var(--muted); }
+/* When the user has navigated into the list, the strip stops
+ * being the Enter target but stays as an information chip. We
+ * keep the accent-soft background and the colored label — the
+ * mode is communicated by the missing ↩ hint and the ghost
+ * button, not by greying out the strip itself. */
 
 .palette-detect-from {
   color: var(--muted);

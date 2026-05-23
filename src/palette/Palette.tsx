@@ -245,20 +245,26 @@ export function Palette({ onClose }: { onClose: () => void }) {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       userActedRef.current = true
-      setSel((s) => Math.min(results.length - 1, Math.max(0, s) + 1))
+      // From the strip sentinel (-1), step into the list at 0.
+      setSel((s) => Math.min(results.length - 1, s + 1))
     } else if (event.key === 'ArrowUp') {
       event.preventDefault()
       userActedRef.current = true
-      setSel((s) => Math.max(0, s - 1))
+      // From the first list item, step back up to the strip when
+      // a detection is present. With no detection, clamp at 0.
+      setSel((s) => {
+        if (s <= 0) return detection ? -1 : 0
+        return s - 1
+      })
     } else if (event.key === 'Escape') {
       event.preventDefault()
       onClose()
     } else if (event.key === 'Enter') {
       event.preventDefault()
       // Detect strip wins Enter while sel is at the -1 sentinel —
-      // user hasn't claimed a list item yet. Any navigation,
-      // mouseenter, or typing flips sel to a real index and the
-      // list takes over.
+      // either because nothing has acted yet, or because the user
+      // arrowed back up into it. Any other index hands Enter to
+      // the list item at that position.
       if (sel < 0 && detection) {
         openDetection(detection)
         return
