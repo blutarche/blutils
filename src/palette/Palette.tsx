@@ -1,7 +1,10 @@
 /**
  * Command Palette.
  *
- * Two sections:
+ * Sections, top to bottom:
+ *   - Detect strip — clipboard-driven hint shown only when the
+ *     query is empty, the smartHints tweak is on, and a Detector
+ *     claimed the clipboard text.
  *   - Tools — every registered Tool, filtered by fuzzy match
  *     against the manifest's name / title / id / tags.
  *   - Commands — built-in actions: Go home, Toggle theme / density,
@@ -12,9 +15,8 @@
  * by fuzzy.ts and the two pools are merged on score; Tools and
  * Commands re-section on render so the user still sees the split.
  *
- * Recent / Pinned / clipboard Detect sections arrive in Phase 5,
- * Phase 7, and Phase 10 — slots are intentionally absent until
- * the data they need exists.
+ * Recent / Pinned sections arrive in Phase 5 and Phase 10 — slots
+ * are intentionally absent until the data they need exists.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
@@ -22,11 +24,17 @@ import type { JSX } from 'preact'
 import { Icon } from '../icons/Icon'
 import { isIconName, type IconName } from '../icons/icon-set'
 import { bestMatch, fuzzyMatch, type Range } from './fuzzy'
-import { tools } from '../tools/_registry'
+import {
+  detectFromText,
+  tools,
+  toolById,
+  type DetectionResult,
+} from '../tools/_registry'
 import { useRouter } from '../router/router'
 import { useTweaks } from '../tweaks/tweaks-context'
 import { clearAllLocal } from '../storage/local'
-import { clearAllSession } from '../storage/session'
+import { clearAllSession, writeSession } from '../storage/session'
+import { inputSessionKey } from '../storage/inputs-mirror'
 import type { ToolManifest } from '../types'
 
 interface Command {
@@ -45,11 +53,59 @@ export function Palette({ onClose }: { onClose: () => void }) {
   const { tweaks, setTweak } = useTweaks()
   const [q, setQ] = useState('')
   const [sel, setSel] = useState(0)
+  const [detection, setDetection] = useState<DetectionResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  // Clipboard detection. The palette open is a user gesture, which
+  // is enough for navigator.clipboard.readText() in most browsers.
+  // Silently fall through on permission denial, an empty clipboard,
+  // or a missing Clipboard API.
+  useEffect(() => {
+    if (!tweaks.smartHints) return
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.readText) return
+    let cancelled = false
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        if (cancelled) return
+        if (!text || text.length < 2) return
+        const result = detectFromText(text)
+        if (result) setDetection(result)
+      })
+      .catch(() => {
+        // permission denied / focus issue / no clipboard text
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [tweaks.smartHints])
+
+  const openDetection = (result: DetectionResult) => {
+    const manifest = toolById.get(result.toolId)
+    if (!manifest) return
+    const seed = result.match.initialInput
+    if (seed !== undefined) {
+      // text.diff packs both halves into a JSON envelope; every
+      // other Tool consumes a plain string for its primary input.
+      if (result.toolId === 'text.diff') {
+        try {
+          const pair = JSON.parse(seed) as { a?: unknown; b?: unknown }
+          if (typeof pair.a === 'string') writeSession(inputSessionKey('text.diff.a'), pair.a)
+          if (typeof pair.b === 'string') writeSession(inputSessionKey('text.diff.b'), pair.b)
+        } catch {
+          // malformed envelope — drop the seed
+        }
+      } else {
+        writeSession(inputSessionKey(result.toolId), seed)
+      }
+    }
+    router.navigate(`/${manifest.category}/${manifest.slug}`)
+    onClose()
+  }
 
   const commands = useMemo<Command[]>(
     () => [
@@ -218,6 +274,12 @@ export function Palette({ onClose }: { onClose: () => void }) {
           />
           <span class="kbd">esc</span>
         </div>
+        {!q && detection && (
+          <DetectStrip
+            detection={detection}
+            onOpen={() => openDetection(detection)}
+          />
+        )}
         <div class="palette-list">
           {results.length === 0 && <div class="palette-empty">no matches</div>}
           {toolResults.length > 0 && (
@@ -304,4 +366,27 @@ function HiText({ text, ranges }: { text: string; ranges: Range[] }) {
 
 function resolveIcon(name: string): IconName {
   return isIconName(name) ? name : 'Braces'
+}
+
+function DetectStrip({
+  detection,
+  onOpen,
+}: {
+  detection: DetectionResult
+  onOpen: () => void
+}) {
+  const manifest = toolById.get(detection.toolId)
+  if (!manifest) return null
+  return (
+    <div class="palette-detect">
+      <Icon name="Sparkles" size={12} />
+      <span class="palette-detect-label">
+        <b>Detected:</b> {detection.match.label}
+      </span>
+      <button type="button" class="btn sm primary" onClick={onOpen}>
+        open in {manifest.name.toLowerCase()}
+      </button>
+      <span class="palette-detect-from">from clipboard</span>
+    </div>
+  )
 }

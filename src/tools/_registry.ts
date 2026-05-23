@@ -23,7 +23,13 @@
 
 import { lazy } from 'preact/compat'
 import type { ComponentType } from 'preact'
-import type { CategoryId, ToolManifest, ToolProps } from '../types'
+import type {
+  CategoryId,
+  Detector,
+  DetectorMatch,
+  ToolManifest,
+  ToolProps,
+} from '../types'
 import { categories, hasCategory } from '../categories'
 
 interface ManifestModule {
@@ -41,6 +47,17 @@ const manifestModules = import.meta.glob<ManifestModule>(
 
 const componentModules = import.meta.glob<ToolModule>('./*/Tool.tsx')
 
+interface DetectModule {
+  detect: Detector
+}
+
+// Detectors are eager — they're tiny regex tests, run synchronously
+// on every palette open. Keeping them in the shell bundle avoids
+// an async fan-out across N lazy chunks for one clipboard read.
+const detectModules = import.meta.glob<DetectModule>('./*/detect.ts', {
+  eager: true,
+})
+
 function folderFromPath(path: string): string | null {
   const m = path.match(/^\.\/([^/]+)\/(?:manifest\.ts|Tool\.tsx)$/)
   return m ? m[1]! : null
@@ -51,6 +68,7 @@ interface RegisteredTool {
   folder: string
   /** Lazy Tool component. Suspense awaits its chunk on first render. */
   Component: ComponentType<ToolProps>
+  detect?: Detector
 }
 
 function loadRegistry(): RegisteredTool[] {
@@ -102,10 +120,12 @@ function loadRegistry(): RegisteredTool[] {
       )
     }
 
+    const detectModule = detectModules[`./${folder}/detect.ts`]
     out.push({
       manifest: m,
       folder,
       Component: lazy(loader),
+      detect: detectModule?.detect,
     })
   }
 
@@ -129,6 +149,29 @@ export const componentById: ReadonlyMap<
   string,
   ComponentType<ToolProps>
 > = new Map(registry.map((r) => [r.manifest.id, r.Component]))
+
+/**
+ * Run every registered Detector and return the highest-confidence
+ * non-null match, or null. The Tool whose Detector wins is named
+ * by `toolId` so the Palette can route the open action.
+ */
+export interface DetectionResult {
+  toolId: string
+  match: DetectorMatch
+}
+
+export function detectFromText(text: string): DetectionResult | null {
+  let best: DetectionResult | null = null
+  for (const r of registry) {
+    if (!r.detect) continue
+    const m = r.detect(text)
+    if (!m) continue
+    if (!best || m.confidence > best.match.confidence) {
+      best = { toolId: r.manifest.id, match: m }
+    }
+  }
+  return best
+}
 
 export interface CategorySection {
   category: CategoryId
