@@ -52,7 +52,13 @@ export function Palette({ onClose }: { onClose: () => void }) {
   const router = useRouter()
   const { tweaks, setTweak } = useTweaks()
   const [q, setQ] = useState('')
+  // sel === -1 is the "no list item armed" sentinel — the detect
+  // strip owns Enter in that state. Once the user navigates with
+  // arrow keys, hovers an item, or types a query, userActedRef
+  // flips and sel takes a real index for the remainder of the
+  // session. Detection arriving later does not yank focus back.
   const [sel, setSel] = useState(0)
+  const userActedRef = useRef(false)
   const [detection, setDetection] = useState<DetectionResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -74,7 +80,13 @@ export function Palette({ onClose }: { onClose: () => void }) {
         if (cancelled) return
         if (!text || text.length < 2) return
         const result = detectFromText(text)
-        if (result) setDetection(result)
+        if (result) {
+          setDetection(result)
+          // The strip takes Enter precedence until the user does
+          // something deliberate. Only disarm the list selection
+          // if the user hasn't already started navigating.
+          if (!userActedRef.current) setSel(-1)
+        }
       })
       .catch(() => {
         // permission denied / focus issue / no clipboard text
@@ -212,7 +224,12 @@ export function Palette({ onClose }: { onClose: () => void }) {
   }, [q, commands])
 
   useEffect(() => {
-    setSel(0)
+    // Typing is a deliberate action; from here on the list owns
+    // Enter and we focus the first result.
+    if (q) {
+      userActedRef.current = true
+      setSel(0)
+    }
   }, [q])
 
   const choose = (item: ResultItem) => {
@@ -227,23 +244,26 @@ export function Palette({ onClose }: { onClose: () => void }) {
   const onKey = (event: JSX.TargetedKeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
-      setSel((s) => Math.min(results.length - 1, s + 1))
+      userActedRef.current = true
+      setSel((s) => Math.min(results.length - 1, Math.max(0, s) + 1))
     } else if (event.key === 'ArrowUp') {
       event.preventDefault()
+      userActedRef.current = true
       setSel((s) => Math.max(0, s - 1))
     } else if (event.key === 'Escape') {
       event.preventDefault()
       onClose()
     } else if (event.key === 'Enter') {
       event.preventDefault()
-      // With no query, the Detect strip is the meaningful target —
-      // Enter accepts it instead of the arbitrary first Tool that
-      // happens to sort to the top of the alphabetised list.
-      if (!q && detection) {
+      // Detect strip wins Enter while sel is at the -1 sentinel —
+      // user hasn't claimed a list item yet. Any navigation,
+      // mouseenter, or typing flips sel to a real index and the
+      // list takes over.
+      if (sel < 0 && detection) {
         openDetection(detection)
         return
       }
-      const r = results[sel]
+      const r = results[Math.max(0, sel)]
       if (r) choose(r)
     }
   }
@@ -284,6 +304,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
         {!q && detection && (
           <DetectStrip
             detection={detection}
+            armed={sel < 0}
             onOpen={() => openDetection(detection)}
           />
         )}
@@ -298,7 +319,10 @@ export function Palette({ onClose }: { onClose: () => void }) {
                   <div
                     key={r.tool.id}
                     class={`pal-item ${i === sel ? 'on' : ''}`}
-                    onMouseEnter={() => setSel(i)}
+                    onMouseEnter={() => {
+                      userActedRef.current = true
+                      setSel(i)
+                    }}
                     onClick={() => choose(r)}
                   >
                     <span class="ic">
@@ -322,7 +346,10 @@ export function Palette({ onClose }: { onClose: () => void }) {
                   <div
                     key={r.cmd.id}
                     class={`pal-item ${i === sel ? 'on' : ''}`}
-                    onMouseEnter={() => setSel(i)}
+                    onMouseEnter={() => {
+                      userActedRef.current = true
+                      setSel(i)
+                    }}
                     onClick={() => choose(r)}
                   >
                     <span class="ic">
@@ -377,21 +404,27 @@ function resolveIcon(name: string): IconName {
 
 function DetectStrip({
   detection,
+  armed,
   onOpen,
 }: {
   detection: DetectionResult
+  armed: boolean
   onOpen: () => void
 }) {
   const manifest = toolById.get(detection.toolId)
   if (!manifest) return null
   return (
-    <div class="palette-detect">
+    <div class={`palette-detect ${armed ? '' : 'is-demoted'}`}>
       <Icon name="Sparkles" size={12} />
       <span class="palette-detect-label">
         <b>Detected:</b> {detection.match.label}
       </span>
-      <button type="button" class="btn sm primary" onClick={onOpen}>
-        <span class="kbd">↩</span>
+      <button
+        type="button"
+        class={`btn sm ${armed ? 'primary' : 'ghost'}`}
+        onClick={onOpen}
+      >
+        {armed && <span class="kbd">↩</span>}
         open in {manifest.name.toLowerCase()}
       </button>
       <span class="palette-detect-from">from clipboard</span>
