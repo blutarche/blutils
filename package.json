@@ -15,6 +15,7 @@
     "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "dependencies": {
+    "lucide-preact": "^1.16.0",
     "preact": "^10.25.0"
   },
   "devDependencies": {

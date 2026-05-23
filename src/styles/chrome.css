@@ -1,0 +1,24 @@
+/**
+ * Chrome surface styles — Sidebar, Status Bar, and the brand mark
+ * that lives inside the Sidebar brand row.
+ *
+ * All colour and dimension comes from --chrome-* tokens so the
+ * Chrome stays cohesive across light and dark themes.
+ */
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--chrome-border-2);
+  background: var(--chrome-bg-2);
+  border-radius: var(--r-1);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  user-select: none;
+}
