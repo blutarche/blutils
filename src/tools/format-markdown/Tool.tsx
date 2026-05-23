@@ -15,8 +15,49 @@
 
 import { useMemo } from 'preact/hooks'
 import DOMPurify from 'dompurify'
-import { marked } from 'marked'
+import { marked, type Tokens } from 'marked'
+import Prism from 'prismjs'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-markup' // html / xml
+import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-clike'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-tsx'
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-yaml'
+import 'prismjs/components/prism-rust'
+import 'prismjs/components/prism-go'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-diff'
 import { useToolInput } from '../../storage/use-tool-input'
+
+const LANG_ALIAS: Record<string, string> = {
+  js: 'javascript',
+  ts: 'typescript',
+  sh: 'bash',
+  shell: 'bash',
+  html: 'markup',
+  xml: 'markup',
+  yml: 'yaml',
+  md: 'markdown',
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) =>
+    c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;',
+  )
+}
+
+function highlightCode(code: string, lang: string): string {
+  const key = LANG_ALIAS[lang] ?? lang
+  const grammar = key ? Prism.languages[key] : undefined
+  if (!grammar) return escapeHtml(code)
+  return Prism.highlight(code, grammar, key)
+}
 
 const SAMPLE = `# Blutils Notes
 
@@ -38,6 +79,20 @@ See the [docs](#) for more.
 `
 
 marked.setOptions({ gfm: true, breaks: false })
+
+// Syntax-highlight fenced code blocks via our shared tokenizer.
+// The output is plain HTML (only <span class="tok-…"> tags), which
+// dompurify allows through its default profile.
+marked.use({
+  renderer: {
+    code(token: Tokens.Code) {
+      const lang = (token.lang ?? '').trim().toLowerCase()
+      const body = highlightCode(token.text, lang)
+      const cls = lang ? ` class="language-${lang}"` : ''
+      return `<pre><code${cls}>${body}</code></pre>\n`
+    },
+  },
+})
 
 export default function Tool() {
   const [text, setText] = useToolInput('format.markdown', SAMPLE)
