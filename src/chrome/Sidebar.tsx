@@ -1,24 +1,44 @@
 /**
  * Sidebar — the catalog's left rail.
  *
- * Renders the registered Tool catalog as categorised sections
- * inside .side-list. Sections and items live inside the same
- * scroll container so they scroll together. When no Tools are
- * registered, a single "tools" section header with an empty
- * placeholder is rendered.
+ * Three vertically-stacked areas inside .side-list:
+ *   1. Pinned — user-ordered, reorderable via @dnd-kit/sortable
+ *      (pointer + touch + keyboard). ⌘1–9 shortcuts shown inline.
+ *      Pin/unpin via Palette Commands only.
+ *   2. Categorised catalog — all registered Tools grouped by
+ *      category, filtered by the search input.
+ *   3. Footer — GitHub link + version.
  *
- * Items use the router's <Link> so navigation stays SPA-internal;
- * the active Tool is highlighted via .on which also paints the
- * 2 px accent rail on the item's left edge.
+ * The filter input focuses with `/` from anywhere outside an
+ * editable element (wired in palette-context; the same guard is
+ * used there).
  */
 
 import type { ToolManifest } from '../types'
-import { tools, toolsByCategory, type CategorySection } from '../tools/_registry'
+import { tools, toolsByCategory, toolById, type CategorySection } from '../tools/_registry'
 import { Icon } from '../icons/Icon'
 import { isIconName, type IconName } from '../icons/icon-set'
 import { Link } from '../router/router'
 import { BrandMark } from './BrandMark'
 import { GithubMark } from './GithubMark'
+import { usePins } from '../pins/pins-context'
+import { useEffect, useState } from 'preact/hooks'
+import {
+  DndContext,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const VERSION = `v${__APP_VERSION__}`
 
@@ -27,8 +47,48 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ activeToolId }: SidebarProps) {
+  const [q, setQ] = useState('')
+  const [isClient, setIsClient] = useState(false)
   const sections = toolsByCategory()
   const empty = tools.length === 0
+  const { pinned, reorder } = usePins()
+
+  useEffect(() => { setIsClient(true) }, [])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const from = pinned.indexOf(String(active.id))
+    const to = pinned.indexOf(String(over.id))
+    if (from !== -1 && to !== -1) reorder(from, to)
+  }
+
+  // Filter: normalised query against name + title + id + tags.
+  const lq = q.toLowerCase()
+  const filterTool = (m: ToolManifest) => {
+    if (!lq) return true
+    return (
+      m.name.toLowerCase().includes(lq) ||
+      m.title.toLowerCase().includes(lq) ||
+      m.id.toLowerCase().includes(lq) ||
+      m.tags.some((t) => t.toLowerCase().includes(lq))
+    )
+  }
+
+  const pinnedManifests = pinned
+    .map((id) => toolById.get(id))
+    .filter((m): m is ToolManifest => !!m && filterTool(m))
+
+  const filteredSections = sections
+    .map((s) => ({ ...s, tools: s.tools.filter(filterTool) }))
+    .filter((s) => s.tools.length > 0)
 
   return (
     <aside class="side" aria-label="Tool catalog">
@@ -48,22 +108,61 @@ export function Sidebar({ activeToolId }: SidebarProps) {
           placeholder="filter"
           aria-label="Filter tools"
           spellcheck={false}
+          value={q}
+          onInput={(e) => setQ((e.target as HTMLInputElement).value)}
         />
-        <span class="kbd-hint">/</span>
+        {!q && <span class="kbd-hint">/</span>}
       </div>
 
       <div class="side-list">
         {empty ? (
-          <>
-            <SectionHeader name="tools" count={0} />
-            <p class="side-empty">
-              no tools registered yet — manifests arrive in phase 2.
-            </p>
-          </>
+          <p class="side-empty">no tools registered yet.</p>
         ) : (
-          sections.map((s) => (
-            <Section key={s.category} section={s} activeToolId={activeToolId} />
-          ))
+          <>
+            {pinnedManifests.length > 0 && (
+              <>
+                <SectionHeader name="pinned" count={pinnedManifests.length} />
+                {isClient ? (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={pinnedManifests.map((m) => m.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {pinnedManifests.map((m, i) => (
+                        <SortableToolItem
+                          key={m.id}
+                          manifest={m}
+                          active={m.id === activeToolId}
+                          shortcutIndex={pinned.indexOf(m.id)}
+                          shortcutN={i < 9 ? i + 1 : undefined}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  pinnedManifests.map((m) => (
+                    <ToolItem
+                      key={m.id}
+                      manifest={m}
+                      active={m.id === activeToolId}
+                    />
+                  ))
+                )}
+              </>
+            )}
+
+            {filteredSections.map((s) => (
+              <Section key={s.category} section={s} activeToolId={activeToolId} />
+            ))}
+
+            {pinnedManifests.length === 0 && filteredSections.length === 0 && (
+              <p class="side-empty">no matches</p>
+            )}
+          </>
         )}
       </div>
 
@@ -118,9 +217,7 @@ function ToolItem({
   manifest: ToolManifest
   active: boolean
 }) {
-  const iconName: IconName = isIconName(manifest.icon)
-    ? manifest.icon
-    : 'Search'
+  const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
   return (
     <Link
       class={`side-item${active ? ' on' : ''}`}
@@ -132,5 +229,48 @@ function ToolItem({
       </span>
       <span class="label">{manifest.name.toLowerCase()}</span>
     </Link>
+  )
+}
+
+function SortableToolItem({
+  manifest,
+  active,
+  shortcutN,
+}: {
+  manifest: ToolManifest
+  active: boolean
+  shortcutIndex: number
+  shortcutN?: number
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: manifest.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : undefined,
+    position: 'relative' as const,
+    zIndex: isDragging ? 10 : undefined,
+  }
+
+  const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
+
+  return (
+    <div ref={setNodeRef} style={style} {...(attributes as unknown as Record<string, unknown>)}>
+      <Link
+        class={`side-item${active ? ' on' : ''}`}
+        href={`/${manifest.category}/${manifest.slug}`}
+        title={manifest.description}
+        {...listeners}
+      >
+        <span class="ic">
+          <Icon name={iconName} size={14} />
+        </span>
+        <span class="label">{manifest.name.toLowerCase()}</span>
+        {shortcutN !== undefined && (
+          <span class="side-shortcut">⌘{shortcutN}</span>
+        )}
+      </Link>
+    </div>
   )
 }

@@ -18,6 +18,9 @@
     "subset:fonts": "node scripts/subset-fonts.mjs"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "dompurify": "^3.4.5",
     "lucide-preact": "^1.16.0",
     "marked": "^18.0.4",

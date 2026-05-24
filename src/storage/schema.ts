@@ -125,6 +125,28 @@ export interface ChainSliceShape {
  * so the chain shape and the chain payload follow the same
  * privacy rules as the rest of the catalog.
  */
+/** Ordered list of pinned Tool ids. */
+export const pinnedSlice: Slice<string[]> = {
+  key: `${NS}:pinned:v1`,
+  defaults: ['format.json', 'time.unix', 'hash.generate', 'encode.base64', 'text.diff'],
+  parse(raw) {
+    if (!Array.isArray(raw)) return null
+    if (!raw.every((x) => typeof x === 'string')) return null
+    return raw as string[]
+  },
+}
+
+/** Most-recent Tool ids, newest first, capped at 12. */
+export const recentSlice: Slice<string[]> = {
+  key: `${NS}:recent:v1`,
+  defaults: [],
+  parse(raw) {
+    if (!Array.isArray(raw)) return null
+    if (!raw.every((x) => typeof x === 'string')) return null
+    return (raw as string[]).slice(0, 12)
+  },
+}
+
 export const chainSlice: Slice<ChainSliceShape> = {
   key: `${NS}:chain:v1`,
   defaults: {

@@ -26,6 +26,7 @@ import { PaletteProvider, usePalette } from '../palette/palette-context'
 import { TabsProvider, useTabs } from '../tabs/tabs-context'
 import { TabsBar } from '../tabs/TabsBar'
 import { Chain } from '../chain/Chain'
+import { PinsProvider, usePins } from '../pins/pins-context'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -36,11 +37,13 @@ export function App({ initialPath }: AppProps) {
   return (
     <TweaksProvider>
       <RouterProvider initialPath={initialPath}>
-        <TabsProvider>
-          <PaletteProvider>
-            <Shell />
-          </PaletteProvider>
-        </TabsProvider>
+        <PinsProvider>
+          <TabsProvider>
+            <PaletteProvider>
+              <Shell />
+            </PaletteProvider>
+          </TabsProvider>
+        </PinsProvider>
       </RouterProvider>
     </TweaksProvider>
   )
@@ -52,12 +55,20 @@ function Shell() {
   const [tweaksOpen, setTweaksOpen] = useState(false)
   const palette = usePalette()
   const tabs = useTabs()
+  const pins = usePins()
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.title = titleFor(match)
     }
   }, [match])
+
+  useEffect(() => {
+    if (match.type === 'tool') pins.recordVisit(match.manifest.id)
+    // recordVisit is stable; match.manifest.id only changes when
+    // the Tool actually changes — intentional dep list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
 
   const activeToolId = match.type === 'tool' ? match.manifest.id : undefined
 

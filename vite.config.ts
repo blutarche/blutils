@@ -41,4 +41,11 @@ export default defineConfig({
     target: 'es2022',
     cssCodeSplit: true,
   },
+  ssr: {
+    // dnd-kit imports React directly; without noExternal the SSR
+    // build externalises it and the react→preact/compat alias is
+    // bypassed, causing "Cannot read properties of null (reading
+    // 'useMemo')" during prerender. Bundling forces the alias.
+    noExternal: ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+  },
 })

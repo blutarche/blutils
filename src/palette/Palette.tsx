@@ -31,10 +31,12 @@ import {
   type DetectionResult,
 } from '../tools/_registry'
 import { useRouter } from '../router/router'
+import { matchRoute } from '../router/match'
 import { useTweaks } from '../tweaks/tweaks-context'
 import { clearAllLocal } from '../storage/local'
 import { clearAllSession, writeSession } from '../storage/session'
 import { inputSessionKey } from '../storage/inputs-mirror'
+import { usePins } from '../pins/pins-context'
 import type { ToolManifest } from '../types'
 
 interface Command {
@@ -51,7 +53,11 @@ type ResultItem =
 export function Palette({ onClose }: { onClose: () => void }) {
   const router = useRouter()
   const { tweaks, setTweak } = useTweaks()
+  const { pinned, recent, isPinned, pin, unpin } = usePins()
   const [q, setQ] = useState('')
+
+  const activeMatch = useMemo(() => matchRoute(router.pathname), [router.pathname])
+  const activeToolId = activeMatch.type === 'tool' ? activeMatch.manifest.id : undefined
   // sel === -1 is the "no list item armed" sentinel — the detect
   // strip owns Enter in that state. Once the user navigates with
   // arrow keys, hovers an item, or types a query, userActedRef
@@ -187,8 +193,34 @@ export function Palette({ onClose }: { onClose: () => void }) {
           window.location.reload()
         },
       },
+      ...(activeToolId && !isPinned(activeToolId)
+        ? [
+            {
+              id: 'pin-tool',
+              name: `Pin ${toolById.get(activeToolId)?.name ?? activeToolId}`,
+              desc: 'add to pinned section (⌘1–9)',
+              run: () => {
+                pin(activeToolId)
+                onClose()
+              },
+            },
+          ]
+        : []),
+      ...(activeToolId && isPinned(activeToolId)
+        ? [
+            {
+              id: 'unpin-tool',
+              name: `Unpin ${toolById.get(activeToolId)?.name ?? activeToolId}`,
+              desc: 'remove from pinned section',
+              run: () => {
+                unpin(activeToolId)
+                onClose()
+              },
+            },
+          ]
+        : []),
     ],
-    [router, tweaks, setTweak, onClose],
+    [router, tweaks, setTweak, onClose, activeToolId, pinned, pin, unpin, isPinned],
   )
 
   const results = useMemo<ResultItem[]>(() => {
@@ -274,6 +306,17 @@ export function Palette({ onClose }: { onClose: () => void }) {
     }
   }
 
+  const recentManifests = useMemo(
+    () =>
+      !q
+        ? recent
+            .map((id) => toolById.get(id))
+            .filter((m): m is ToolManifest => !!m)
+            .slice(0, 5)
+        : [],
+    [q, recent],
+  )
+
   const toolResults = results.filter(
     (r): r is Extract<ResultItem, { kind: 'tool' }> => r.kind === 'tool',
   )
@@ -315,7 +358,30 @@ export function Palette({ onClose }: { onClose: () => void }) {
           />
         )}
         <div class="palette-list">
-          {results.length === 0 && <div class="palette-empty">no matches</div>}
+          {results.length === 0 && recentManifests.length === 0 && (
+            <div class="palette-empty">no matches</div>
+          )}
+          {recentManifests.length > 0 && (
+            <>
+              <div class="pal-section">Recent</div>
+              {recentManifests.map((m) => (
+                <div
+                  key={m.id}
+                  class="pal-item"
+                  onClick={() => {
+                    router.navigate(`/${m.category}/${m.slug}`)
+                    onClose()
+                  }}
+                >
+                  <span class="ic">
+                    <Icon name={resolveIcon(m.icon)} size={14} />
+                  </span>
+                  <span class="name">{m.name}</span>
+                  <span class="desc">{m.description}</span>
+                </div>
+              ))}
+            </>
+          )}
           {toolResults.length > 0 && (
             <>
               <div class="pal-section">Tools</div>

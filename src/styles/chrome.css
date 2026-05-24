@@ -225,6 +225,13 @@
   text-overflow: ellipsis;
 }
 
+.side-shortcut {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--chrome-muted-3);
+  flex-shrink: 0;
+}
+
 .side-foot {
   display: flex;
   align-items: center;
