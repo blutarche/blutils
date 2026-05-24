@@ -7,8 +7,11 @@
  */
 
 import { Icon } from '../icons/Icon'
+import { usePalette } from '../palette/palette-context'
 
 export function Home() {
+  const palette = usePalette()
+
   return (
     <>
       <h1 class="home-wordmark">
@@ -20,7 +23,9 @@ export function Home() {
         everything runs in your browser — nothing leaves it.
       </p>
 
-      <div class="home-cta">
+      <div class="home-cta" onClick={palette.open} role="button" tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && palette.open()}
+      >
         <Icon name="Search" size={14} />
         <span class="hint">
           press <span class="kbd">⌘K</span> or <span class="kbd">/</span> to

@@ -52,7 +52,7 @@
   font-size: 11.5px;
   font-family: var(--font-mono);
   color: var(--muted);
-  cursor: default;
+  cursor: pointer;
   border-right: 1px solid var(--line);
   transition: background 120ms, color 120ms;
 }

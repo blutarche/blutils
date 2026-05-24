@@ -29,11 +29,6 @@ export function StatusBar({
 }: StatusBarProps) {
   return (
     <footer class="status" aria-label="Status bar">
-      <span class="seg ok" title="No data leaves the browser">
-        <span class="dot" />
-        local
-      </span>
-
       <span class="seg seg-tool">{contextLabel}</span>
 
       <span class="spacer" />

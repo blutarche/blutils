@@ -63,7 +63,7 @@
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 12px;
-  cursor: default;
+  cursor: pointer;
   transition: background 120ms, border-color 120ms, color 120ms;
 }
 
@@ -83,6 +83,10 @@
   font-family: var(--font-mono);
   font-size: 10.5px;
   color: var(--muted-2);
+  line-height: 1;
+  padding: 0 3px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
 }
 
 .h-btn.on .kbd {
@@ -137,7 +141,7 @@
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: 12px;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   white-space: nowrap;
   transition: background 120ms, border-color 120ms, color 120ms;
@@ -265,6 +269,13 @@
   border: 1px solid var(--line);
   background: var(--surface-2);
   border-radius: var(--r-2);
+  cursor: pointer;
+  transition: border-color 120ms, background 120ms;
+}
+
+.home-cta:hover {
+  border-color: var(--accent-bd);
+  background: var(--surface);
 }
 
 .home-cta .hint {
@@ -277,3 +288,4 @@
 .home-cta .hint .kbd {
   margin: 0 2px;
 }
+

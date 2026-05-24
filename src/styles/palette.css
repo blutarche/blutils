@@ -149,7 +149,7 @@
   gap: 12px;
   padding: 8px 10px;
   border-radius: var(--r-2);
-  cursor: default;
+  cursor: pointer;
 }
 
 .pal-item.on {

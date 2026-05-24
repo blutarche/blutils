@@ -150,9 +150,29 @@
   padding-top: 14px;
 }
 
+.side-section.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.side-section.clickable:hover {
+  color: var(--chrome-muted);
+}
+
 .side-section .count {
+  margin-left: auto;
   color: var(--chrome-muted-3);
   font-size: 10px;
+}
+
+.side-section-chevron {
+  display: inline-flex;
+  color: var(--chrome-muted-3);
+  transition: transform 150ms;
+}
+
+.side-section-chevron.collapsed {
+  transform: rotate(-90deg);
 }
 
 .side-empty {
@@ -227,9 +247,13 @@
 
 .side-shortcut {
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--chrome-muted-3);
+  font-size: 9.5px;
+  color: var(--chrome-muted);
   flex-shrink: 0;
+  padding: 1px 4px;
+  border: 1px solid var(--chrome-border-2);
+  border-radius: var(--r-1);
+  background: var(--chrome-bg-2);
 }
 
 .side-foot {
@@ -257,6 +281,26 @@
 }
 
 .side-foot-gh:hover {
+  color: var(--chrome-ink);
+}
+
+.side-foot-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--chrome-border-2);
+  flex-shrink: 0;
+}
+
+.side-foot-link {
+  color: var(--chrome-muted-3);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  transition: color 120ms;
+}
+
+.side-foot-link:hover {
   color: var(--chrome-ink);
 }
 

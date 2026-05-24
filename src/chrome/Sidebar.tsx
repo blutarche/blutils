@@ -40,8 +40,6 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-const VERSION = `v${__APP_VERSION__}`
-
 export interface SidebarProps {
   activeToolId?: string
 }
@@ -177,8 +175,15 @@ export function Sidebar({ activeToolId }: SidebarProps) {
           <GithubMark size={12} />
         </a>
         <span>mit</span>
-        <span class="side-foot-sep" />
-        <span>{VERSION}</span>
+        <span class="side-foot-dot" />
+        <a
+          class="side-foot-link"
+          href="https://blutarche.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          blutarche.dev
+        </a>
       </div>
     </aside>
   )
@@ -191,21 +196,48 @@ function Section({
   section: CategorySection
   activeToolId?: string
 }) {
+  const [collapsed, setCollapsed] = useState(false)
   return (
     <>
-      <SectionHeader name={section.name} count={section.tools.length} />
-      {section.tools.map((m) => (
-        <ToolItem key={m.id} manifest={m} active={m.id === activeToolId} />
-      ))}
+      <SectionHeader
+        name={section.name}
+        count={section.tools.length}
+        collapsed={collapsed}
+        onToggle={() => setCollapsed((c) => !c)}
+      />
+      {!collapsed &&
+        section.tools.map((m) => (
+          <ToolItem key={m.id} manifest={m} active={m.id === activeToolId} />
+        ))}
     </>
   )
 }
 
-function SectionHeader({ name, count }: { name: string; count: number }) {
+function SectionHeader({
+  name,
+  count,
+  collapsed,
+  onToggle,
+}: {
+  name: string
+  count: number
+  collapsed?: boolean
+  onToggle?: () => void
+}) {
   return (
-    <div class="side-section">
+    <div
+      class={`side-section${onToggle ? ' clickable' : ''}`}
+      onClick={onToggle}
+      role={onToggle ? 'button' : undefined}
+      aria-expanded={onToggle ? !collapsed : undefined}
+    >
       <span>{name}</span>
       <span class="count">{count}</span>
+      {onToggle && (
+        <span class={`side-section-chevron${collapsed ? ' collapsed' : ''}`}>
+          <Icon name="ChevronDown" size={10} />
+        </span>
+      )}
     </div>
   )
 }

@@ -158,7 +158,7 @@ export default function Tool() {
         )}
       </div>
 
-      <div class="two-col">
+      <div class="two-col" style={{ marginBottom: 14 }}>
         <div class="panel">
           <div class="panel-h">
             <span>test text</span>
@@ -175,24 +175,14 @@ export default function Tool() {
               </button>
             </span>
           </div>
-          <div class="panel-b">
+          <div class="panel-b" style={{ padding: '8px 10px' }}>
             <textarea
               class="area bare"
-              style={{ minHeight: 200 }}
+              style={{ minHeight: 180 }}
               value={text}
               onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
               spellcheck={false}
             />
-            <div
-              class="regex-text"
-              style={{
-                marginTop: 10,
-                paddingTop: 10,
-                borderTop: '1px dashed var(--line)',
-              }}
-            >
-              {highlighted}
-            </div>
           </div>
         </div>
         <div class="panel">
@@ -254,6 +244,15 @@ export default function Tool() {
               )
             })}
           </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">
+          <span>highlighted</span>
+        </div>
+        <div class="panel-b" style={{ padding: '10px 14px' }}>
+          <div class="regex-text">{highlighted}</div>
         </div>
       </div>
     </>
