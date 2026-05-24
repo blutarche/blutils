@@ -1,0 +1,24 @@
+# Cloudflare Pages response headers.
+#
+# CSP directive values are the canonical source from src/app/csp.ts.
+# The meta tag injected by vite.config.ts at build time mirrors these.
+# Update both files together when the policy changes.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+
+# Immutable cache for hashed static assets (Vite fingerprints JS/CSS).
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts are versioned via the directory structure; long cache is safe.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Prerendered HTML must revalidate so deploys propagate immediately.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
