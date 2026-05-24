@@ -72,7 +72,12 @@ const { render, allRoutePaths, canonicalRoutePaths } = await import(serverEntryU
 
 // ── 3. helpers ────────────────────────────────────────────────
 const HOST = 'https://utils.blutarche.dev'
-const OG_IMAGE = `${HOST}/og.svg`
+// PNG, not SVG: Slack / X / Facebook / LinkedIn / Discord all refuse
+// SVG OG images. The PNG is rasterized from og.svg by
+// `scripts/render-og.mjs` (run via `pnpm og`).
+const OG_IMAGE = `${HOST}/og.png`
+const OG_IMAGE_WIDTH = 1200
+const OG_IMAGE_HEIGHT = 630
 
 const escapeHtml = (s) =>
   String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])
@@ -97,6 +102,9 @@ function buildHeadMeta(head) {
     `<meta property="og:description" content="${escapeAttr(head.description)}" />`,
     `<meta property="og:url" content="${escapeAttr(head.canonical)}" />`,
     `<meta property="og:image" content="${escapeAttr(OG_IMAGE)}" />`,
+    `<meta property="og:image:type" content="image/png" />`,
+    `<meta property="og:image:width" content="${OG_IMAGE_WIDTH}" />`,
+    `<meta property="og:image:height" content="${OG_IMAGE_HEIGHT}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:image" content="${escapeAttr(OG_IMAGE)}" />`,
     `<link rel="canonical" href="${escapeAttr(head.canonical)}" />`,

@@ -15,7 +15,8 @@
     "build:prerender": "node scripts/prerender.mjs",
     "preview": "node scripts/preview-static.mjs",
     "typecheck": "tsc --noEmit",
-    "subset:fonts": "node scripts/subset-fonts.mjs"
+    "subset:fonts": "node scripts/subset-fonts.mjs",
+    "render:og": "node scripts/render-og.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -30,10 +31,12 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^22.10.5",
     "@types/prismjs": "^1.26.6",
     "preact-render-to-string": "^6.7.0",
     "typescript": "^5.7.2",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "wawoff2": "^2.0.1"
   }
 }
