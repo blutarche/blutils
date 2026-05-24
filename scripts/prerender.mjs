@@ -13,6 +13,10 @@
  *   - the build's CSS inlined into <head>, so first paint
  *     does not block on a CSS network request
  *
+ * After all routes, emits:
+ *   - dist/sitemap.xml  (canonical routes only, no aliases)
+ *   - dist/robots.txt
+ *
  * Output paths follow the canonical URLs:
  *   /                  → dist/index.html
  *   /chain             → dist/chain/index.html
@@ -64,9 +68,12 @@ if (cssMatch) {
 const serverEntryUrl = pathToFileURL(
   join(distServer, 'entry-server.js'),
 ).href
-const { render, allRoutePaths } = await import(serverEntryUrl)
+const { render, allRoutePaths, canonicalRoutePaths } = await import(serverEntryUrl)
 
-// ── 3. emit one HTML per route ────────────────────────────────
+// ── 3. helpers ────────────────────────────────────────────────
+const HOST = 'https://utils.blutarche.dev'
+const OG_IMAGE = `${HOST}/og.svg`
+
 const escapeHtml = (s) =>
   String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])
 
@@ -83,17 +90,20 @@ const escapeAttr = (s) =>
       })[c],
   )
 
-function buildHeadMeta(head, pathname) {
+function buildHeadMeta(head) {
   return [
     `<meta property="og:type" content="${escapeAttr(head.ogType)}" />`,
     `<meta property="og:title" content="${escapeAttr(head.title)}" />`,
     `<meta property="og:description" content="${escapeAttr(head.description)}" />`,
     `<meta property="og:url" content="${escapeAttr(head.canonical)}" />`,
-    `<meta name="twitter:card" content="summary" />`,
+    `<meta property="og:image" content="${escapeAttr(OG_IMAGE)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:image" content="${escapeAttr(OG_IMAGE)}" />`,
     `<link rel="canonical" href="${escapeAttr(head.canonical)}" />`,
   ].join('\n    ')
 }
 
+// ── 4. emit one HTML per route ────────────────────────────────
 const paths = allRoutePaths()
 let count = 0
 let totalBytes = 0
@@ -110,7 +120,7 @@ for (const pathname of paths) {
 
   output = output.replace(
     '</head>',
-    `    ${buildHeadMeta(head, pathname)}\n  </head>`,
+    `    ${buildHeadMeta(head)}\n  </head>`,
   )
 
   output = output.replace(
@@ -137,3 +147,34 @@ for (const pathname of paths) {
 console.log(
   `prerendered ${count} routes, ${(totalBytes / 1024).toFixed(1)} KB total`,
 )
+
+// ── 5. sitemap.xml (canonical routes only) ────────────────────
+const now = new Date().toISOString().split('T')[0]
+const canonical = canonicalRoutePaths()
+const sitemapUrls = canonical
+  .map((p) => {
+    const loc = escapeAttr(`${HOST}${p}`)
+    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${now}</lastmod>\n  </url>`
+  })
+  .join('\n')
+
+const sitemap = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  sitemapUrls,
+  '</urlset>',
+].join('\n')
+
+writeFileSync(join(distClient, 'sitemap.xml'), sitemap, 'utf-8')
+console.log(`  sitemap.xml → ${canonical.length} canonical URLs`)
+
+// ── 6. robots.txt ─────────────────────────────────────────────
+const robots = [
+  'User-agent: *',
+  'Allow: /',
+  '',
+  `Sitemap: ${HOST}/sitemap.xml`,
+].join('\n')
+
+writeFileSync(join(distClient, 'robots.txt'), robots, 'utf-8')
+console.log('  robots.txt')

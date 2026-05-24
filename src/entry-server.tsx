@@ -13,7 +13,7 @@
 
 import { renderToStringAsync } from 'preact-render-to-string'
 import { App } from './app/App'
-import { matchRoute, allRoutePaths } from './router/match'
+import { matchRoute, allRoutePaths, canonicalRoutePaths } from './router/match'
 
 export interface RouteHead {
   title: string
@@ -61,4 +61,4 @@ export async function render(pathname: string): Promise<{
   return { html, head: headFor(pathname) }
 }
 
-export { allRoutePaths }
+export { allRoutePaths, canonicalRoutePaths }

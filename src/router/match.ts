@@ -55,3 +55,16 @@ export function matchRoute(pathname: string): RouteMatch {
 export function allRoutePaths(): string[] {
   return Array.from(routes.keys())
 }
+
+/**
+ * Canonical pathnames only (no aliases) — used to build sitemap.xml.
+ * Aliases resolve to the same content as their canonical URL and
+ * should not appear as independent sitemap entries.
+ */
+export function canonicalRoutePaths(): string[] {
+  const canonical: string[] = ['/', '/chain']
+  for (const m of tools) {
+    canonical.push(`/${m.category}/${m.slug}`)
+  }
+  return canonical
+}

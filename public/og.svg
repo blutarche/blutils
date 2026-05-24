@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0F0F11"/>
+  <!-- subtle grid lines -->
+  <line x1="0" y1="1" x2="1200" y2="1" stroke="#1E1E24" stroke-width="1"/>
+  <line x1="0" y1="629" x2="1200" y2="629" stroke="#1E1E24" stroke-width="1"/>
+  <!-- brand mark box -->
+  <rect x="80" y="220" width="64" height="64" rx="8" fill="#1E1E24" stroke="#2D2D38" stroke-width="1"/>
+  <text x="112" y="261" font-family="JetBrains Mono, monospace" font-size="22" font-weight="600" fill="#7C6FD4" text-anchor="middle" letter-spacing="-0.5">b.</text>
+  <!-- wordmark -->
+  <text font-family="JetBrains Mono, monospace" font-size="72" font-weight="500" letter-spacing="-1">
+    <tspan x="168" y="278" fill="#7C6FD4">bl</tspan><tspan fill="#F2F2F7">utils</tspan><tspan fill="#7C6FD4">.</tspan>
+  </text>
+  <!-- tagline -->
+  <text x="80" y="342" font-family="'Space Grotesk', sans-serif" font-size="24" fill="#8B8B9E" letter-spacing="0.01em">local-only developer utilities — nothing leaves your browser.</text>
+  <!-- bottom rule + url -->
+  <line x1="80" y1="430" x2="1120" y2="430" stroke="#2D2D38" stroke-width="1"/>
+  <text x="80" y="466" font-family="JetBrains Mono, monospace" font-size="18" fill="#5A5A6E">utils.blutarche.dev</text>
+  <!-- local dot -->
+  <circle cx="1100" cy="460" r="5" fill="#6FBF83"/>
+  <text x="1114" y="466" font-family="JetBrains Mono, monospace" font-size="14" fill="#6FBF83">local</text>
+</svg>
