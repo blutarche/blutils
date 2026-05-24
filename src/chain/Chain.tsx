@@ -100,6 +100,7 @@ export function Chain() {
   )
   const [results, setResults] = useState<ChainStepResult[]>([])
   const [picker, setPicker] = useState<string | null>(null)
+  const [pickerQuery, setPickerQuery] = useState('')
   const [isClient, setIsClient] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const runToken = useRef(0)
@@ -147,6 +148,11 @@ export function Chain() {
     return null
   }, [results])
 
+  const closePicker = () => {
+    setPicker(null)
+    setPickerQuery('')
+  }
+
   const addStep = (afterId: string, opId: string) => {
     setChain((prev) => {
       const idx = prev.findIndex((s) => s.id === afterId)
@@ -154,7 +160,7 @@ export function Chain() {
       next.splice(idx + 1, 0, { id: genId(), opId })
       return next
     })
-    setPicker(null)
+    closePicker()
   }
 
   const removeStep = (id: string) => {
@@ -195,30 +201,58 @@ export function Chain() {
           ? 'is-error'
           : ''
 
+    const q = pickerQuery.trim().toLowerCase()
+    const filteredOps = q
+      ? allOps.filter(
+          (o) =>
+            o.label.toLowerCase().includes(q) ||
+            o.id.toLowerCase().includes(q),
+        )
+      : allOps
+
     const addWidget =
       picker === step.id ? (
         <div class="chain-picker">
           <div class="chain-picker-h">
-            <span class="name">add step after #{i + 1}</span>
-            <span class="spacer" />
+            <Icon name="Search" size={11} class="chain-picker-search-icon" />
+            <input
+              class="chain-picker-search"
+              placeholder="filter ops…"
+              value={pickerQuery}
+              onInput={(e) =>
+                setPickerQuery((e.target as HTMLInputElement).value)
+              }
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') closePicker()
+                if (e.key === 'Enter' && filteredOps[0]) {
+                  addStep(step.id, filteredOps[0].id)
+                }
+              }}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+            />
             <button
               class="btn ghost sm"
               aria-label="close picker"
-              onClick={() => setPicker(null)}
+              onClick={closePicker}
             >
               <Icon name="X" size={11} />
             </button>
           </div>
           <div class="chain-picker-b">
-            {allOps.map((o) => (
-              <button
-                key={o.id}
-                class="btn sm"
-                onClick={() => addStep(step.id, o.id)}
-              >
-                <Icon name={o.icon as IconName} size={11} /> {o.label}
-              </button>
-            ))}
+            {filteredOps.length > 0 ? (
+              filteredOps.map((o) => (
+                <button
+                  key={o.id}
+                  class="btn sm"
+                  onClick={() => addStep(step.id, o.id)}
+                >
+                  <Icon name={o.icon as IconName} size={11} /> {o.label}
+                </button>
+              ))
+            ) : (
+              <span class="chain-picker-empty">no ops match</span>
+            )}
           </div>
         </div>
       ) : (

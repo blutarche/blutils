@@ -139,8 +139,25 @@
   font-size: 11.5px;
   border-radius: var(--r-2) var(--r-2) 0 0;
 }
-.chain-picker-h .name { color: var(--ink); font-weight: 500; }
-.chain-picker-h .spacer { flex: 1; }
+.chain-picker-search-icon { color: var(--muted); flex-shrink: 0; }
+
+.chain-picker-search {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  min-width: 0;
+}
+.chain-picker-search::placeholder { color: var(--muted-2); }
+
+.chain-picker-empty {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
 
 .chain-picker-b {
   padding: 12px 14px;
