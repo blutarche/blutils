@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import type { ComponentChildren } from 'preact'
 import { Icon } from '../icons/Icon'
 import type { IconName } from '../icons/icon-set'
 import { readSlice, writeSlice } from '../storage/local'
@@ -20,6 +21,23 @@ import { chainSlice, type ChainStepRecord } from '../storage/schema'
 import { allOps, getOp } from './ops-registry'
 import { runChain, type ChainStepResult } from './runner'
 import type { Op } from '../types'
+import {
+  DndContext,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const INPUT_KEY = 'chain.input'
 
@@ -28,6 +46,49 @@ function genId(): string {
     return crypto.randomUUID().slice(0, 8)
   }
   return Math.random().toString(36).slice(2, 10)
+}
+
+/** Sortable wrapper that owns the single useSortable call per step.
+ * Passes a pre-built drag-handle element into its render-prop child
+ * so the handle can be placed anywhere inside without a second
+ * useSortable call. */
+function SortableStepWrap({
+  stepId,
+  children,
+}: {
+  stepId: string
+  children: (dragHandle: ComponentChildren) => ComponentChildren
+}) {
+  const {
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    attributes,
+    listeners,
+  } = useSortable({ id: stepId })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  }
+
+  // `attributes` (ARIA) belongs on the sortable item container.
+  // `listeners` (pointer/keyboard events) belongs on the drag handle.
+  const handle = (
+    <span class="chain-drag-handle" {...listeners} title="drag to reorder">
+      <Icon name="GripVertical" size={13} />
+    </span>
+  )
+
+  return (
+    // @ts-expect-error dnd-kit types `role` as `string`; Preact expects the
+    // narrower AriaRole union. The values are always valid ARIA roles.
+    <div ref={setNodeRef} style={style} class="chain-step-wrap" {...attributes}>
+      {children(handle)}
+    </div>
+  )
 }
 
 export function Chain() {
@@ -39,19 +100,25 @@ export function Chain() {
   )
   const [results, setResults] = useState<ChainStepResult[]>([])
   const [picker, setPicker] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
   const runToken = useRef(0)
 
-  // Persist chain layout on change.
+  useEffect(() => { setIsClient(true) }, [])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
   useEffect(() => {
     writeSlice(chainSlice, { steps: chain })
   }, [chain])
 
-  // Persist input on change. sessionStorage only — no mirror.
   useEffect(() => {
     writeSession(INPUT_KEY, input)
   }, [input])
 
-  // Re-run the chain whenever the shape or input changes.
   useEffect(() => {
     const token = ++runToken.current
     const ops: Op[] = chain.slice(1).map((step) => {
@@ -61,9 +128,7 @@ export function Chain() {
           id: step.opId,
           label: step.opId,
           icon: 'Hash',
-          fn: () => {
-            throw new Error(`unknown op "${step.opId}"`)
-          },
+          fn: () => { throw new Error(`unknown op "${step.opId}"`) },
         }
       )
     })
@@ -96,11 +161,163 @@ export function Chain() {
     setChain((prev) => prev.filter((s) => s.id !== id))
   }
 
-  const copyFinal = () => {
-    if (finalResult != null) {
-      navigator.clipboard?.writeText(finalResult).catch(() => {})
-    }
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setChain((prev) => {
+      const from = prev.findIndex((s) => s.id === String(active.id))
+      const to = prev.findIndex((s) => s.id === String(over.id))
+      if (from <= 0 || to <= 0) return prev // input step stays at 0
+      return arrayMove(prev, from, to)
+    })
   }
+
+  const copyValue = (value: string, id: string) => {
+    navigator.clipboard?.writeText(value).catch(() => {})
+    setCopiedId(id)
+    setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 1500)
+  }
+
+  const renderStepContent = (
+    step: ChainStepRecord,
+    i: number,
+    dragHandle: ComponentChildren,
+  ) => {
+    const isInput = step.opId === 'input'
+    const op = isInput ? null : getOp(step.opId)
+    const result: ChainStepResult | undefined = isInput ? undefined : results[i - 1]
+    const isLast = i === chain.length - 1
+    const stateClass = isInput
+      ? 'is-input'
+      : result?.ok && isLast
+        ? 'is-output'
+        : result && !result.ok && !result.pending
+          ? 'is-error'
+          : ''
+
+    const addWidget =
+      picker === step.id ? (
+        <div class="chain-picker">
+          <div class="chain-picker-h">
+            <span class="name">add step after #{i + 1}</span>
+            <span class="spacer" />
+            <button
+              class="btn ghost sm"
+              aria-label="close picker"
+              onClick={() => setPicker(null)}
+            >
+              <Icon name="X" size={11} />
+            </button>
+          </div>
+          <div class="chain-picker-b">
+            {allOps.map((o) => (
+              <button
+                key={o.id}
+                class="btn sm"
+                onClick={() => addStep(step.id, o.id)}
+              >
+                <Icon name={o.icon as IconName} size={11} /> {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button class="chain-add" onClick={() => setPicker(step.id)}>
+          <Icon name="Plus" size={11} /> add step
+        </button>
+      )
+
+    const copyTarget = isInput
+      ? input
+      : result?.ok
+        ? (result.value ?? '')
+        : result && !result.ok && !result.pending
+          ? (result.error ?? '')
+          : null
+
+    return (
+      <>
+        <div class={`chain-step ${stateClass}`}>
+          <div class="chain-step-h">
+            {!isInput && dragHandle}
+            <span class="num">step {i + 1} /</span>
+            <Icon
+              name={(isInput ? 'Type' : (op?.icon ?? 'Hash')) as IconName}
+              size={13}
+            />
+            <span class="name">
+              {isInput ? 'input' : (op?.label ?? step.opId)}
+            </span>
+            <span class="spacer" />
+            {result?.ok && <span class="chip ok">ok</span>}
+            {result && !result.ok && !result.pending && (
+              <span class="chip bad">error</span>
+            )}
+            {result?.pending && <span class="chip">skipped</span>}
+            {copyTarget !== null && (
+              <button
+                class="btn ghost sm"
+                aria-label={copiedId === step.id ? 'copied' : 'copy'}
+                style={copiedId === step.id ? { color: 'var(--ok)' } : undefined}
+                onClick={() => copyValue(copyTarget, step.id)}
+              >
+                <Icon name={copiedId === step.id ? 'Check' : 'Copy'} size={11} />
+              </button>
+            )}
+            {!isInput && (
+              <button
+                class="btn ghost sm"
+                aria-label="remove step"
+                onClick={() => removeStep(step.id)}
+              >
+                <Icon name="X" size={11} />
+              </button>
+            )}
+          </div>
+          <div class="chain-step-b">
+            {isInput ? (
+              <textarea
+                class="area"
+                value={input}
+                onInput={(e) =>
+                  setInput((e.target as HTMLTextAreaElement).value)
+                }
+                spellcheck={false}
+                rows={3}
+              />
+            ) : result?.ok ? (
+              <pre class="chain-out">
+                {result.value || <em class="muted">(empty)</em>}
+              </pre>
+            ) : result && !result.pending ? (
+              <pre class="chain-out chain-out-err">{result.error}</pre>
+            ) : (
+              <pre class="chain-out muted">…</pre>
+            )}
+          </div>
+        </div>
+        {addWidget}
+      </>
+    )
+  }
+
+  const stepsEl = chain.map((step, i) => {
+    const isInput = step.opId === 'input'
+
+    if (isInput || !isClient) {
+      return (
+        <div key={step.id} class="chain-step-wrap">
+          {renderStepContent(step, i, null)}
+        </div>
+      )
+    }
+
+    return (
+      <SortableStepWrap key={step.id} stepId={step.id}>
+        {(handle) => renderStepContent(step, i, handle)}
+      </SortableStepWrap>
+    )
+  })
 
   return (
     <div class="chain-view">
@@ -114,112 +331,31 @@ export function Chain() {
         <span class="spacer" />
         <button
           class="btn sm"
-          onClick={copyFinal}
+          onClick={() => finalResult != null && copyValue(finalResult, 'final')}
           disabled={finalResult == null}
         >
-          <Icon name="Copy" size={11} /> copy final
+          <Icon name={copiedId === 'final' ? 'Check' : 'Copy'} size={11} />
+          {copiedId === 'final' ? 'copied!' : 'copy final'}
         </button>
       </div>
 
       <div class="chain-stage">
-        {chain.map((step, i) => {
-          const isInput = step.opId === 'input'
-          const op = isInput ? null : getOp(step.opId)
-          // Input step has no entry in `results`; step N's result is
-          // results[N - 1] because results map to the non-input ops.
-          const result = isInput ? null : results[i - 1]
-          const isLast = i === chain.length - 1
-          const stateClass = isInput
-            ? 'is-input'
-            : result?.ok && isLast
-              ? 'is-output'
-              : result && !result.ok && !result.pending
-                ? 'is-error'
-                : ''
-          return (
-            <div key={step.id} class="chain-step-wrap">
-              <div class={`chain-step ${stateClass}`}>
-                <div class="chain-step-h">
-                  <span class="num">step {i + 1} /</span>
-                  <Icon
-                    name={(isInput ? 'Type' : (op?.icon ?? 'Hash')) as IconName}
-                    size={13}
-                  />
-                  <span class="name">
-                    {isInput ? 'input' : (op?.label ?? step.opId)}
-                  </span>
-                  <span class="spacer" />
-                  {result?.ok && <span class="chip ok">ok</span>}
-                  {result && !result.ok && !result.pending && (
-                    <span class="chip bad">{result.error}</span>
-                  )}
-                  {result?.pending && <span class="chip">skipped</span>}
-                  {!isInput && (
-                    <button
-                      class="btn ghost sm"
-                      aria-label="remove step"
-                      onClick={() => removeStep(step.id)}
-                    >
-                      <Icon name="X" size={11} />
-                    </button>
-                  )}
-                </div>
-                <div class="chain-step-b">
-                  {isInput ? (
-                    <textarea
-                      class="area"
-                      value={input}
-                      onInput={(e) =>
-                        setInput((e.target as HTMLTextAreaElement).value)
-                      }
-                      spellcheck={false}
-                      rows={3}
-                    />
-                  ) : result?.ok ? (
-                    <pre class="chain-out">
-                      {result.value || <em class="muted">(empty)</em>}
-                    </pre>
-                  ) : result && !result.pending ? (
-                    <pre class="chain-out chain-out-err">{result.error}</pre>
-                  ) : (
-                    <pre class="chain-out muted">…</pre>
-                  )}
-                </div>
-              </div>
-
-              {picker === step.id ? (
-                <div class="chain-picker">
-                  <div class="chain-picker-h">
-                    <span class="name">add step after #{i + 1}</span>
-                    <span class="spacer" />
-                    <button
-                      class="btn ghost sm"
-                      aria-label="close picker"
-                      onClick={() => setPicker(null)}
-                    >
-                      <Icon name="X" size={11} />
-                    </button>
-                  </div>
-                  <div class="chain-picker-b">
-                    {allOps.map((o) => (
-                      <button
-                        key={o.id}
-                        class="btn sm"
-                        onClick={() => addStep(step.id, o.id)}
-                      >
-                        <Icon name={o.icon as IconName} size={11} /> {o.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <button class="chain-add" onClick={() => setPicker(step.id)}>
-                  <Icon name="Plus" size={11} /> add step
-                </button>
-              )}
-            </div>
-          )
-        })}
+        {isClient ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={chain.map((s) => s.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {stepsEl}
+            </SortableContext>
+          </DndContext>
+        ) : (
+          stepsEl
+        )}
       </div>
     </div>
   )

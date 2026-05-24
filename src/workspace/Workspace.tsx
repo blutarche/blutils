@@ -10,10 +10,16 @@
 
 import type { ComponentChildren } from 'preact'
 
-export function Workspace({ children }: { children: ComponentChildren }) {
+export function Workspace({
+  children,
+  flush = false,
+}: {
+  children: ComponentChildren
+  flush?: boolean
+}) {
   return (
     <section class="main" aria-label="Workspace">
-      <div class="main-inner">{children}</div>
+      {flush ? children : <div class="main-inner">{children}</div>}
     </section>
   )
 }

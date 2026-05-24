@@ -9,8 +9,19 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin: -24px;
 }
+
+.chain-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted-2);
+  cursor: grab;
+  touch-action: none;
+  padding: 0 2px;
+  transition: color 100ms;
+}
+.chain-drag-handle:hover { color: var(--muted); }
+.chain-drag-handle:active { cursor: grabbing; }
 
 .chain-toolbar {
   display: flex;

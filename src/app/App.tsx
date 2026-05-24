@@ -50,7 +50,7 @@ export function App({ initialPath }: AppProps) {
 }
 
 function Shell() {
-  const { pathname } = useRouter()
+  const { pathname, navigate } = useRouter()
   const match = useMemo(() => matchRoute(pathname), [pathname])
   const [tweaksOpen, setTweaksOpen] = useState(false)
   const palette = usePalette()
@@ -77,11 +77,12 @@ function Shell() {
       <Sidebar activeToolId={activeToolId} />
       <Header context={contextLabelFor(match)} />
       {tabs.enabled && <TabsBar />}
-      <Workspace>
+      <Workspace flush={match.type === 'chain'}>
         <RouteView match={match} />
       </Workspace>
       <StatusBar
         contextLabel={statusLabelFor(match)}
+        onOpenChain={() => navigate('/chain')}
         onOpenTweaks={() => setTweaksOpen(true)}
         onOpenPalette={palette.open}
         tabsEnabled={tabs.enabled}

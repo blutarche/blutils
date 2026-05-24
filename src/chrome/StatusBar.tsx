@@ -14,6 +14,7 @@ import { Icon } from '../icons/Icon'
 
 export interface StatusBarProps {
   contextLabel?: string
+  onOpenChain?: () => void
   onOpenTweaks?: () => void
   onOpenPalette?: () => void
   tabsEnabled?: boolean
@@ -22,6 +23,7 @@ export interface StatusBarProps {
 
 export function StatusBar({
   contextLabel = 'home',
+  onOpenChain,
   onOpenTweaks,
   onOpenPalette,
   tabsEnabled = false,
@@ -33,7 +35,13 @@ export function StatusBar({
 
       <span class="spacer" />
 
-      <span class="seg" role="button" tabIndex={-1}>
+      <span
+        class="seg"
+        role="button"
+        tabIndex={0}
+        onClick={onOpenChain}
+        aria-label="Open chain mode"
+      >
         <Icon name="GitMerge" size={12} />
         chain
       </span>
