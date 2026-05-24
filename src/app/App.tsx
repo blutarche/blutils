@@ -25,6 +25,7 @@ import { componentById } from '../tools/_registry'
 import { PaletteProvider, usePalette } from '../palette/palette-context'
 import { TabsProvider, useTabs } from '../tabs/tabs-context'
 import { TabsBar } from '../tabs/TabsBar'
+import { Chain } from '../chain/Chain'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -94,19 +95,10 @@ function RouteView({ match }: { match: RouteMatch }) {
       )
     }
     case 'chain':
-      return <ChainPlaceholder />
+      return <Chain />
     case 'not-found':
       return <NotFound />
   }
-}
-
-function ChainPlaceholder() {
-  return (
-    <div>
-      <h1 class="route-heading">chain</h1>
-      <p class="route-copy">chain mode arrives in phase 9.</p>
-    </div>
-  )
 }
 
 function NotFound() {

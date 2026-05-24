@@ -107,3 +107,46 @@ export const tabsSlice: Slice<TabsSliceShape> = {
     return { enabled: r.enabled, tabs, activeId }
   },
 }
+
+export interface ChainStepRecord {
+  /** Stable id, generated when the step is added. */
+  id: string
+  /** Op id from the ops registry, or the literal "input" sentinel. */
+  opId: string
+}
+
+export interface ChainSliceShape {
+  steps: ChainStepRecord[]
+}
+
+/**
+ * Chain layout persists to localStorage. The `input` step's text
+ * lives in sessionStorage (bucket B) like every other Tool input,
+ * so the chain shape and the chain payload follow the same
+ * privacy rules as the rest of the catalog.
+ */
+export const chainSlice: Slice<ChainSliceShape> = {
+  key: `${NS}:chain:v1`,
+  defaults: {
+    steps: [
+      { id: 'input', opId: 'input' },
+      { id: 'b64', opId: 'b64.encode' },
+      { id: 'sha', opId: 'hash.sha256' },
+    ],
+  },
+  parse(raw) {
+    if (!raw || typeof raw !== 'object') return null
+    const r = raw as Record<string, unknown>
+    if (!Array.isArray(r.steps)) return null
+    const steps: ChainStepRecord[] = []
+    for (const s of r.steps) {
+      if (!s || typeof s !== 'object') return null
+      const rec = s as Record<string, unknown>
+      if (typeof rec.id !== 'string' || typeof rec.opId !== 'string') return null
+      steps.push({ id: rec.id, opId: rec.opId })
+    }
+    const first = steps[0]
+    if (!first || first.opId !== 'input') return null
+    return { steps }
+  },
+}

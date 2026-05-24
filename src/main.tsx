@@ -9,6 +9,7 @@ import './styles/palette.css'
 import './styles/tools.css'
 import './styles/syntax.css'
 import './styles/tabs.css'
+import './styles/chain.css'
 import './styles/tweaks.css'
 import { App } from './app/App'
 
