@@ -11,6 +11,7 @@
  */
 
 import { Icon } from '../icons/Icon'
+import { modKey } from '../app/platform'
 
 export interface StatusBarProps {
   contextLabel?: string
@@ -76,7 +77,7 @@ export function StatusBar({
         onClick={onOpenPalette}
         aria-label="Open command palette"
       >
-        <kbd>⌘K</kbd>
+        <kbd>{modKey}K</kbd>
         palette
       </span>
     </footer>

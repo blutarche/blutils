@@ -9,9 +9,16 @@
  * Persists to localStorage (recentSlice). Updated on every
  * Tool navigation via the `recordVisit` action.
  *
- * ⌘1–9: global shortcut bound here (once, on mount) that jumps
- * to the Nth pinned tool (1-indexed). The binding lives in the
- * context so it applies regardless of which component is focused.
+ * G 1–9: global leader-key shortcut bound here (once, on mount)
+ * that jumps to the Nth pinned tool (1-indexed). Press `G`, then
+ * a digit within 1.2 s. The binding lives in the context so it
+ * applies regardless of which component is focused.
+ *
+ * Why a leader key instead of ⌘1–9: every major browser owns
+ * ⌘/Ctrl + digit for tab switching, and `preventDefault()` does
+ * not reliably stop the browser from acting first. `G <n>` is
+ * conflict-free, platform-neutral (renders identically on Mac
+ * and Windows), and matches the GitHub / Linear convention.
  */
 
 import { createContext } from 'preact'
@@ -61,21 +68,61 @@ export function PinsProvider({ children }: { children: ComponentChildren }) {
     writeSlice(recentSlice, recent)
   }, [recent])
 
-  // ⌘1–9: navigate to the Nth pinned tool.
+  // G <1-9>: navigate to the Nth pinned tool via leader key.
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return
-      const n = parseInt(e.key, 10)
-      if (n < 1 || n > 9) return
-      const id = pinned[n - 1]
-      if (!id) return
-      const manifest = toolById.get(id)
-      if (!manifest) return
-      e.preventDefault()
-      router.navigate(`/${manifest.category}/${manifest.slug}`)
+    let armed = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const disarm = () => {
+      armed = false
+      if (timer !== undefined) {
+        clearTimeout(timer)
+        timer = undefined
+      }
     }
+
+    const isTypingTarget = (t: EventTarget | null) => {
+      if (!(t instanceof HTMLElement)) return false
+      if (t.isContentEditable) return true
+      const tag = t.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+    }
+
+    const handler = (e: KeyboardEvent) => {
+      // Ignore any chord — leader key is a plain `g`.
+      if (e.metaKey || e.ctrlKey || e.altKey) {
+        disarm()
+        return
+      }
+      if (isTypingTarget(e.target)) {
+        disarm()
+        return
+      }
+
+      if (armed) {
+        const n = parseInt(e.key, 10)
+        disarm()
+        if (Number.isNaN(n) || n < 1 || n > 9) return
+        const id = pinned[n - 1]
+        if (!id) return
+        const manifest = toolById.get(id)
+        if (!manifest) return
+        e.preventDefault()
+        router.navigate(`/${manifest.category}/${manifest.slug}`)
+        return
+      }
+
+      if (e.key === 'g' || e.key === 'G') {
+        armed = true
+        timer = setTimeout(disarm, 1200)
+      }
+    }
+
     window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    return () => {
+      window.removeEventListener('keydown', handler)
+      disarm()
+    }
   }, [pinned, router])
 
   const isPinned = (id: string) => pinned.includes(id)

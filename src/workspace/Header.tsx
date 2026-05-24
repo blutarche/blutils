@@ -15,6 +15,7 @@
 import { useTweaks } from '../tweaks/tweaks-context'
 import { Icon } from '../icons/Icon'
 import { Link } from '../router/router'
+import { modKey } from '../app/platform'
 
 export interface HeaderProps {
   /** Active context label rendered after the home-tag separator. */
@@ -52,7 +53,7 @@ export function Header({ context = 'home' }: HeaderProps) {
       <button class="h-btn" type="button">
         <Icon name="Search" size={12} />
         commands
-        <span class="kbd">⌘K</span>
+        <span class="kbd">{modKey}K</span>
       </button>
     </header>
   )

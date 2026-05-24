@@ -8,6 +8,7 @@
 
 import { Icon } from '../icons/Icon'
 import { usePalette } from '../palette/palette-context'
+import { modKey } from '../app/platform'
 
 export function Home() {
   const palette = usePalette()
@@ -28,7 +29,7 @@ export function Home() {
       >
         <Icon name="Search" size={14} />
         <span class="hint">
-          press <span class="kbd">⌘K</span> or <span class="kbd">/</span> to
+          press <span class="kbd">{modKey}K</span> or <span class="kbd">/</span> to
           jump to any tool
         </span>
         <button class="btn primary" type="button">

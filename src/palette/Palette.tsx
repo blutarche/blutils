@@ -198,7 +198,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
             {
               id: 'pin-tool',
               name: `Pin ${toolById.get(activeToolId)?.name ?? activeToolId}`,
-              desc: 'add to pinned section (⌘1–9)',
+              desc: 'add to pinned section (g 1–9)',
               run: () => {
                 pin(activeToolId)
                 onClose()

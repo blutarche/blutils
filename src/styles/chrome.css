@@ -183,6 +183,41 @@
   line-height: 1.5;
 }
 
+.side-row {
+  position: relative;
+}
+
+.side-pin-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  color: var(--chrome-muted-3);
+  border-radius: var(--r-1);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 100ms, color 100ms, background 100ms;
+}
+.side-row:hover .side-pin-btn,
+.side-pin-btn:focus-visible {
+  opacity: 1;
+}
+.side-pin-btn:hover {
+  color: var(--chrome-ink);
+  background: var(--chrome-bg-2);
+}
+/* Hide the shortcut chip while the pin button is showing so they
+   don't crowd each other on hover. */
+.side-row:hover .side-shortcut {
+  opacity: 0;
+}
+
 .side-item {
   display: flex;
   align-items: center;
@@ -254,6 +289,7 @@
   border: 1px solid var(--chrome-border-2);
   border-radius: var(--r-1);
   background: var(--chrome-bg-2);
+  transition: opacity 100ms;
 }
 
 .side-foot {

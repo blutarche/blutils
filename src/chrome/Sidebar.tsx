@@ -3,8 +3,9 @@
  *
  * Three vertically-stacked areas inside .side-list:
  *   1. Pinned — user-ordered, reorderable via @dnd-kit/sortable
- *      (pointer + touch + keyboard). ⌘1–9 shortcuts shown inline.
- *      Pin/unpin via Palette Commands only.
+ *      (pointer + touch + keyboard). `g 1`–`g 9` shortcuts shown inline.
+ *      Hovering any row reveals a pin/unpin button on the right
+ *      edge; the Palette also exposes the same commands.
  *   2. Categorised catalog — all registered Tools grouped by
  *      category, filtered by the search input.
  *   3. Footer — GitHub link + version.
@@ -242,6 +243,35 @@ function SectionHeader({
   )
 }
 
+/** Pin/unpin affordance shown on hover. Sits as a sibling of the
+ * Link so the click doesn't navigate and (in sortable rows) doesn't
+ * arm a drag — dnd-kit listeners are bound to the Link, not here. */
+function PinToggleButton({
+  toolId,
+  pinned,
+}: {
+  toolId: string
+  pinned: boolean
+}) {
+  const { pin, unpin } = usePins()
+  return (
+    <button
+      type="button"
+      class={`side-pin-btn${pinned ? ' on' : ''}`}
+      aria-label={pinned ? 'unpin tool' : 'pin tool'}
+      title={pinned ? 'unpin' : 'pin'}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (pinned) unpin(toolId)
+        else pin(toolId)
+      }}
+    >
+      <Icon name={pinned ? 'PinOff' : 'Pin'} size={12} />
+    </button>
+  )
+}
+
 function ToolItem({
   manifest,
   active,
@@ -249,18 +279,22 @@ function ToolItem({
   manifest: ToolManifest
   active: boolean
 }) {
+  const { isPinned } = usePins()
   const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
   return (
-    <Link
-      class={`side-item${active ? ' on' : ''}`}
-      href={`/${manifest.category}/${manifest.slug}`}
-      title={manifest.description}
-    >
-      <span class="ic">
-        <Icon name={iconName} size={14} />
-      </span>
-      <span class="label">{manifest.name.toLowerCase()}</span>
-    </Link>
+    <div class="side-row">
+      <Link
+        class={`side-item${active ? ' on' : ''}`}
+        href={`/${manifest.category}/${manifest.slug}`}
+        title={manifest.description}
+      >
+        <span class="ic">
+          <Icon name={iconName} size={14} />
+        </span>
+        <span class="label">{manifest.name.toLowerCase()}</span>
+      </Link>
+      <PinToggleButton toolId={manifest.id} pinned={isPinned(manifest.id)} />
+    </div>
   )
 }
 
@@ -288,7 +322,12 @@ function SortableToolItem({
   const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
 
   return (
-    <div ref={setNodeRef} style={style} {...(attributes as unknown as Record<string, unknown>)}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      class="side-row"
+      {...(attributes as unknown as Record<string, unknown>)}
+    >
       <Link
         class={`side-item${active ? ' on' : ''}`}
         href={`/${manifest.category}/${manifest.slug}`}
@@ -300,9 +339,10 @@ function SortableToolItem({
         </span>
         <span class="label">{manifest.name.toLowerCase()}</span>
         {shortcutN !== undefined && (
-          <span class="side-shortcut">⌘{shortcutN}</span>
+          <span class="side-shortcut">g {shortcutN}</span>
         )}
       </Link>
+      <PinToggleButton toolId={manifest.id} pinned />
     </div>
   )
 }
