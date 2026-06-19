@@ -140,7 +140,10 @@
   font-size: 12.5px;
   line-height: 1.5;
   outline: none;
-  resize: none;
+  /* User-adjustable height — drag the bottom-right grip to grow or
+   * shrink the box. min-height is the floor; each Tool seeds its
+   * own starting height via an inline minHeight. */
+  resize: vertical;
   min-height: 200px;
 }
 
@@ -160,6 +163,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  /* Top-align so each panel hugs its own content. Without this the
+   * grid stretches both columns to equal height, leaving a
+   * resizable textarea shorter than its panel — the drag grip then
+   * floats in empty space, and resizing one column stretches the
+   * other's panel without growing its input. Top-aligning keeps
+   * every box flush with its content and resizing independent. */
+  align-items: start;
 }
 
 @media (max-width: 1100px) {

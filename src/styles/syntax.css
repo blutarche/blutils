@@ -92,6 +92,8 @@
   white-space: pre;
   overflow: auto;
   min-height: 360px;
+  /* Match the input textarea — drag the grip to resize the output. */
+  resize: vertical;
 }
 
 /* Regex pattern preview strip — sits beside or below the input. */
