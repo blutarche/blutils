@@ -15,6 +15,8 @@
     "build:prerender": "node scripts/prerender.mjs",
     "preview": "node scripts/preview-static.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "subset:fonts": "node scripts/subset-fonts.mjs",
     "render:og": "node scripts/render-og.mjs"
   },
@@ -37,6 +39,7 @@
     "preact-render-to-string": "^6.7.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
+    "vitest": "^4.1.9",
     "wawoff2": "^2.0.1"
   }
 }
