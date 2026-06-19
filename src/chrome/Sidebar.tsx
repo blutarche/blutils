@@ -16,7 +16,7 @@
  */
 
 import type { ToolManifest } from '../types'
-import { tools, toolsByCategory, toolById, type CategorySection } from '../tools/_registry'
+import { tools, toolsByCategory, toolById, prefetchTool, type CategorySection } from '../tools/_registry'
 import { Icon } from '../icons/Icon'
 import { isIconName, type IconName } from '../icons/icon-set'
 import { Link } from '../router/router'
@@ -281,12 +281,16 @@ function ToolItem({
 }) {
   const { isPinned } = usePins()
   const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
+  const warm = () => prefetchTool(manifest.id)
   return (
     <div class="side-row">
       <Link
         class={`side-item${active ? ' on' : ''}`}
         href={`/${manifest.category}/${manifest.slug}`}
         title={manifest.description}
+        onMouseEnter={warm}
+        onFocus={warm}
+        onTouchStart={warm}
       >
         <span class="ic">
           <Icon name={iconName} size={14} />
@@ -320,6 +324,7 @@ function SortableToolItem({
   }
 
   const iconName: IconName = isIconName(manifest.icon) ? manifest.icon : 'Search'
+  const warm = () => prefetchTool(manifest.id)
 
   return (
     <div
@@ -332,6 +337,9 @@ function SortableToolItem({
         class={`side-item${active ? ' on' : ''}`}
         href={`/${manifest.category}/${manifest.slug}`}
         title={manifest.description}
+        onMouseEnter={warm}
+        onFocus={warm}
+        onTouchStart={warm}
         {...listeners}
       >
         <span class="ic">

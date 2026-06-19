@@ -17,6 +17,7 @@ import { StatusBar } from '../chrome/StatusBar'
 import { Header } from '../workspace/Header'
 import { Workspace } from '../workspace/Workspace'
 import { Home } from '../workspace/Home'
+import { ToolSkeleton } from '../workspace/ToolSkeleton'
 import { TweaksProvider } from '../tweaks/tweaks-context'
 import { TweaksPanel } from '../tweaks/TweaksPanel'
 import { RouterProvider, useRouter } from '../router/router'
@@ -101,7 +102,7 @@ function RouteView({ match }: { match: RouteMatch }) {
       const Component = componentById.get(match.manifest.id)
       if (!Component) return <NotFound />
       return (
-        <Suspense fallback={<p class="route-loading">loading…</p>}>
+        <Suspense fallback={<ToolSkeleton manifest={match.manifest} />}>
           <Component initialState={match.initialState} />
         </Suspense>
       )

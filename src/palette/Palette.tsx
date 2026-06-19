@@ -28,6 +28,7 @@ import {
   detectFromText,
   tools,
   toolById,
+  prefetchTool,
   type DetectionResult,
 } from '../tools/_registry'
 import { useRouter } from '../router/router'
@@ -88,6 +89,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
         const result = detectFromText(text)
         if (result) {
           setDetection(result)
+          prefetchTool(result.toolId)
           // The strip takes Enter precedence until the user does
           // something deliberate. Only disarm the list selection
           // if the user hasn't already started navigating.
@@ -264,6 +266,17 @@ export function Palette({ onClose }: { onClose: () => void }) {
     }
   }, [q])
 
+  // Warm the armed result's chunk so Enter / click navigates into
+  // an already-loaded Tool. Hover does the same via onMouseEnter.
+  // Gated on userActedRef so opening the palette to run a command
+  // doesn't speculatively fetch the first tool's chunk (sel starts
+  // at 0); only deliberate typing / arrowing / hovering warms.
+  useEffect(() => {
+    if (!userActedRef.current) return
+    const r = results[Math.max(0, sel)]
+    if (r?.kind === 'tool') prefetchTool(r.tool.id)
+  }, [sel, results])
+
   const choose = (item: ResultItem) => {
     if (item.kind === 'tool') {
       router.navigate(`/${item.tool.category}/${item.tool.slug}`)
@@ -368,6 +381,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
                 <div
                   key={m.id}
                   class="pal-item"
+                  onMouseEnter={() => prefetchTool(m.id)}
                   onClick={() => {
                     router.navigate(`/${m.category}/${m.slug}`)
                     onClose()
@@ -394,6 +408,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
                     onMouseEnter={() => {
                       userActedRef.current = true
                       setSel(i)
+                      prefetchTool(r.tool.id)
                     }}
                     onClick={() => choose(r)}
                   >

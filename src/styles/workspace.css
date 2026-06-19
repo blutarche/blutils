@@ -215,6 +215,102 @@
   font-size: 12px;
 }
 
+/* ─── Tool loading fallback ───────────────────────────────────
+ * Shows the real (eager-manifest) title + description plus a
+ * neutral indeterminate bar — no structural mock, since the real
+ * Tool layouts vary too much for a fake one to match. Usually
+ * skipped entirely thanks to prefetch-on-intent; this is the
+ * cold-load / slow-net / direct-URL path. */
+.tool-skel {
+  animation: skel-fade 160ms ease-out both;
+}
+
+@keyframes skel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.skel-chip {
+  color: var(--muted);
+  gap: 6px;
+}
+
+.skel-spinner {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-hi);
+  border-top-color: var(--accent);
+  animation: skel-spin 700ms linear infinite;
+}
+
+@keyframes skel-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Indeterminate progress bar — a slim accent sliver tracks across
+ * a hairline rail. Honest "working…" signal that promises nothing
+ * about the layout to come. */
+.skel-bar {
+  position: relative;
+  height: 2px;
+  margin-top: 2px;
+  border-radius: var(--r-1);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.skel-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 32%;
+  border-radius: inherit;
+  background: var(--accent);
+  animation: skel-slide 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes skel-slide {
+  from { left: -34%; }
+  to { left: 102%; }
+}
+
+/* Reduced-motion: a progress bar's animation *is* its function,
+ * so we keep it animating — just trade the large positional slide
+ * (the part vestibular-sensitive users react to) for a calm
+ * in-place opacity pulse. The spinner likewise pulses instead of
+ * spinning. */
+@media (prefers-reduced-motion: reduce) {
+  .tool-skel { animation: none; }
+  .skel-spinner {
+    animation: skel-pulse 1.4s ease-in-out infinite;
+    border-top-color: var(--line-hi);
+  }
+  .skel-bar-fill {
+    left: 0;
+    width: 100%;
+    animation: skel-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skel-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .route-heading {
   margin: 0 0 6px;
   font-family: var(--font-mono);
