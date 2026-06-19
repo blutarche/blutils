@@ -147,6 +147,25 @@ This keeps the 7-category sidebar scannable. Aliases (`/format/json-to-yaml`) + 
 
 ⭐ = strongest new picks. My add to the build order after the original Tier-1 batch: **JSON→types, IP/CIDR calc, Timezone converter, Hex viewer, Color-contrast checker, JSON tree viewer** — all high value, light/no dep, no duplication.
 
+## Final status — shipped (catalog 10 → 41)
+
+All built via per-tool implementer agents, each driven execute → vet → finish: scoped Vitest in the agent, then a central gate (`pnpm test`/`typecheck`/`build`) + a top-level cross-model **Codex vet** on the logic, adjudicated, fixed, and committed. 467 tests across 31 new tool suites; Vitest infra added (it was advertised but missing).
+
+**Shipped (31 new):**
+- **generate:** random string, UUID v4, ULID, password/passphrase
+- **encode:** URL, HTML entities, hex/hexdump, base (radix), Base32/Base58, ROT13/Caesar, JWT signer
+- **hash:** HMAC
+- **text:** case converter, line tools, slugify, text statistics
+- **time:** timezone converter
+- **format:** JSON→TypeScript, data-format converter (JSON/YAML/TOML/CSV), .env↔JSON
+- **inspect:** JWT decoder (+ fixed hash-detector misroute), color converter, WCAG contrast, IP/CIDR subnet, JSON tree, URL parser, HTTP status, chmod, Unicode inspector, JSON diff, hash identifier
+
+**Real bugs the cross-model vet caught & fixed (not cosmetic):** password require-each-class entropy bias (→ uniform rejection sampling + inclusion-exclusion entropy); JWT base64url validation gap; WCAG contrast ignoring alpha (→ compositing); HTML numeric entities emitting lone surrogates; base58 empty/all-zero; base32 malformed-length acceptance; data-converter destroying YAML/TOML dates + swallowing malformed CSV; .env key-injection on serialize; JSON-diff stack overflow; hash-id over-confident prefixes; ULID case-insensitive decode.
+
+**Dependencies added** (lazy-chunk only, council-vetted): `js-yaml` (≥4.1.1, safe load), `smol-toml`, `papaparse` (with `escapeFormulae`) — all imported in lazy `engine.ts`, zero main-page cost.
+
+**Deliberately deferred (anti-bloat / risk):** XML in the converter (entity/DTD advisory surface); cron builder (would make two cron tools — the parser already covers it); SVG placeholder, image→data-URI, transliterate (marginal). Revisit on demand.
+
 ## Random string generator — design (council-hardened)
 
 - **Folder:** `src/tools/generate-random/` · **id:** `generate.random` · **slug:** `random` · **category:** generate · **icon:** `Dices` (lucide).
