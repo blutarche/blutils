@@ -25,16 +25,21 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "dompurify": "^3.4.5",
+    "js-yaml": "^4.2.0",
     "lucide-preact": "^1.16.0",
     "marked": "^18.0.4",
+    "papaparse": "^5.5.4",
     "preact": "^10.25.0",
     "prismjs": "^1.30.0",
-    "qrcode-generator": "^2.0.4"
+    "qrcode-generator": "^2.0.4",
+    "smol-toml": "^1.6.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
     "@resvg/resvg-js": "^2.6.2",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.5",
+    "@types/papaparse": "^5.5.2",
     "@types/prismjs": "^1.26.6",
     "preact-render-to-string": "^6.7.0",
     "typescript": "^5.7.2",
