@@ -11,7 +11,7 @@
  */
 
 import { Suspense } from 'preact/compat'
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { Sidebar } from '../chrome/Sidebar'
 import { StatusBar } from '../chrome/StatusBar'
 import { Header } from '../workspace/Header'
@@ -68,13 +68,71 @@ function Shell() {
     }
   }, [match])
 
-  // Close the mobile nav drawer whenever the route changes (the user
-  // tapped a tool) and reset the content scroll so each tool opens at
-  // the top rather than mid-page.
+  // Scroll restoration. A brand-new view opens at the top, but
+  // returning to one you've already scrolled — switching back to an
+  // open tab, or browser back/forward — restores where you left off,
+  // rather than jarring you to the top every time.
+  //
+  // The memory is keyed per *view*: in Multi-Tab Mode each tab keeps
+  // its own position (so two tabs on the same path don't collide and a
+  // fresh tab still opens at the top), otherwise the path is the key.
+  const scrollKey =
+    tabs.enabled && tabs.activeId
+      ? `${tabs.activeId}::${pathname}`
+      : pathname
+  const scrollMem = useRef<Map<string, number>>(new Map())
+  const scrollKeyRef = useRef(scrollKey)
+  scrollKeyRef.current = scrollKey
+  const restoringRef = useRef(false)
+
+  // Continuously record the scroll position of the active view so the
+  // outgoing position is already saved by the time we navigate away.
+  // `scroll` doesn't bubble, so capture it; throttle to one write per
+  // frame. Programmatic restores are skipped to avoid saving a value
+  // that was momentarily clamped before late content settled in.
+  useEffect(() => {
+    let raf = 0
+    const onScroll = (e: Event) => {
+      const el = e.target
+      if (
+        restoringRef.current ||
+        !(el instanceof HTMLElement) ||
+        !el.classList.contains('main-inner')
+      )
+        return
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        scrollMem.current.set(scrollKeyRef.current, el.scrollTop)
+      })
+    }
+    document.addEventListener('scroll', onScroll, true)
+    return () => {
+      document.removeEventListener('scroll', onScroll, true)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
+  // Close the mobile nav drawer on navigation, then restore (or reset)
+  // the scroll for the view we just landed on.
   useEffect(() => {
     setNavOpen(false)
-    document.querySelector('.main-inner')?.scrollTo({ top: 0 })
-  }, [pathname])
+    const el = document.querySelector('.main-inner')
+    if (!(el instanceof HTMLElement)) return
+    const target = scrollMem.current.get(scrollKey) ?? 0
+    restoringRef.current = true
+    el.scrollTop = target
+    // Re-assert next frame: a lazily-loaded Tool can settle its height
+    // a tick late, clamping the first assignment.
+    const raf = requestAnimationFrame(() => {
+      if (el.scrollTop !== target) el.scrollTop = target
+      restoringRef.current = false
+    })
+    return () => {
+      cancelAnimationFrame(raf)
+      restoringRef.current = false
+    }
+  }, [scrollKey])
 
   useEffect(() => {
     if (!navOpen) return
