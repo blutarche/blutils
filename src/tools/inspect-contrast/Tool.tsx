@@ -30,11 +30,13 @@ function toHex(c: { r: number; g: number; b: number }): string {
 }
 
 export default function Tool() {
-  const [fgText, setFgText] = useToolInput('inspect.contrast.fg', SAMPLE_FG)
-  const [bgText, setBgText] = useToolInput('inspect.contrast.bg', SAMPLE_BG)
+  const [fgText, setFgText] = useToolInput('inspect.contrast.fg', '')
+  const [bgText, setBgText] = useToolInput('inspect.contrast.bg', '')
 
-  const fg = useMemo(() => parseColor(fgText), [fgText])
-  const bg = useMemo(() => parseColor(bgText), [bgText])
+  const isEmpty = fgText.trim() === '' && bgText.trim() === ''
+
+  const fg = useMemo(() => (fgText.trim() ? parseColor(fgText) : null), [fgText])
+  const bg = useMemo(() => (bgText.trim() ? parseColor(bgText) : null), [bgText])
 
   const ratio = useMemo(
     () => (fg && bg ? effectiveContrast(fg, bg) : null),
@@ -52,7 +54,8 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>color.contrast</h1>
-        {ratio !== null ? (
+        <button type="button" class="btn ghost sm" onClick={() => { setFgText(SAMPLE_FG); setBgText(SAMPLE_BG) }} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : ratio !== null ? (
           <span class="chip accent">{ratio.toFixed(1)}:1</span>
         ) : (
           <span class="chip bad">
@@ -84,6 +87,7 @@ export default function Tool() {
           swatch={fgCss}
           valid={fg !== null}
           fallback={SAMPLE_FG}
+          placeholder={SAMPLE_FG}
         />
         <ColorField
           label="background"
@@ -92,66 +96,73 @@ export default function Tool() {
           swatch={bgCss}
           valid={bg !== null}
           fallback={SAMPLE_BG}
+          placeholder={SAMPLE_BG}
         />
       </div>
 
-      <div class="panel" style={{ marginBottom: 14 }}>
-        <div class="panel-h">
-          <span>sample</span>
-        </div>
-        <div
-          class="panel-b"
-          style={{
-            background: bgCss,
-            color: fgCss,
-            padding: '24px 20px',
-          }}
-        >
-          <div style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.3 }}>
-            The quick brown fox
-          </div>
-          <div style={{ fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>
-            jumps over the lazy dog. Pack my box with five dozen liquor jugs.
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-h">
-          <span>wcag</span>
-          {ratio !== null && (
-            <span class="actions">
-              <span class="chip">{ratio.toFixed(2)}:1</span>
-            </span>
-          )}
-        </div>
-        <div class="panel-b">
-          {assess ? (
-            <dl class="kv" style={{ gridTemplateColumns: '120px 1fr' }}>
-              <dt>normal AA</dt>
-              <dd>
-                <Badge pass={assess.normalAA} hint="≥ 4.5" />
-              </dd>
-              <dt>normal AAA</dt>
-              <dd>
-                <Badge pass={assess.normalAAA} hint="≥ 7" />
-              </dd>
-              <dt>large AA</dt>
-              <dd>
-                <Badge pass={assess.largeAA} hint="≥ 3" />
-              </dd>
-              <dt>large AAA</dt>
-              <dd>
-                <Badge pass={assess.largeAAA} hint="≥ 4.5" />
-              </dd>
-            </dl>
-          ) : (
-            <div class="palette-empty" style={{ padding: 12 }}>
-              enter two valid colors
+      {isEmpty ? (
+        <div class="tool-empty">Enter a foreground and background color to see the WCAG contrast ratio.</div>
+      ) : (
+        <>
+          <div class="panel" style={{ marginBottom: 14 }}>
+            <div class="panel-h">
+              <span>sample</span>
             </div>
-          )}
-        </div>
-      </div>
+            <div
+              class="panel-b"
+              style={{
+                background: bgCss,
+                color: fgCss,
+                padding: '24px 20px',
+              }}
+            >
+              <div style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.3 }}>
+                The quick brown fox
+              </div>
+              <div style={{ fontSize: 14, marginTop: 8, lineHeight: 1.5 }}>
+                jumps over the lazy dog. Pack my box with five dozen liquor jugs.
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h">
+              <span>wcag</span>
+              {ratio !== null && (
+                <span class="actions">
+                  <span class="chip">{ratio.toFixed(2)}:1</span>
+                </span>
+              )}
+            </div>
+            <div class="panel-b">
+              {assess ? (
+                <dl class="kv" style={{ gridTemplateColumns: '120px 1fr' }}>
+                  <dt>normal AA</dt>
+                  <dd>
+                    <Badge pass={assess.normalAA} hint="≥ 4.5" />
+                  </dd>
+                  <dt>normal AAA</dt>
+                  <dd>
+                    <Badge pass={assess.normalAAA} hint="≥ 7" />
+                  </dd>
+                  <dt>large AA</dt>
+                  <dd>
+                    <Badge pass={assess.largeAA} hint="≥ 3" />
+                  </dd>
+                  <dt>large AAA</dt>
+                  <dd>
+                    <Badge pass={assess.largeAAA} hint="≥ 4.5" />
+                  </dd>
+                </dl>
+              ) : (
+                <div class="palette-empty" style={{ padding: 12 }}>
+                  enter two valid colors
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }
@@ -163,6 +174,7 @@ interface ColorFieldProps {
   swatch: string
   valid: boolean
   fallback: string
+  placeholder?: string
 }
 
 function ColorField({
@@ -172,12 +184,13 @@ function ColorField({
   swatch,
   valid,
   fallback,
+  placeholder = '#rrggbb or rgb(…)',
 }: ColorFieldProps) {
   return (
     <div class="panel">
       <div class="panel-h">
         <span>{label}</span>
-        {!valid && (
+        {text.trim() !== '' && !valid && (
           <span class="actions">
             <span class="chip bad">invalid</span>
           </span>
@@ -219,7 +232,7 @@ function ColorField({
           value={text}
           onInput={(e) => onText((e.target as HTMLInputElement).value)}
           spellcheck={false}
-          placeholder="#rrggbb or rgb(…)"
+          placeholder={placeholder}
         />
       </div>
     </div>

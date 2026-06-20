@@ -22,10 +22,13 @@ import { jsonToTypes } from './engine'
 const SAMPLE_JSON = `{"id":1,"name":"Ada","active":true,"tags":["beta","admin"],"roles":[{"name":"owner","level":9},{"name":"editor"}],"meta":{"twoFA":true,"lastLogin":1747800000}}`
 
 export default function Tool(_props: ToolProps) {
-  const [input, setInput] = useToolInput('format.types', SAMPLE_JSON)
+  const [input, setInput] = useToolInput('format.types', '')
   const [rootName, setRootName] = useState('Root')
 
+  const isEmpty = input.trim() === ''
+
   const result = useMemo(() => {
+    if (isEmpty) return { ok: true as const, value: '' }
     try {
       return {
         ok: true as const,
@@ -34,7 +37,7 @@ export default function Tool(_props: ToolProps) {
     } catch (err) {
       return { ok: false as const, error: (err as Error).message }
     }
-  }, [input, rootName])
+  }, [input, rootName, isEmpty])
 
   const copyOutput = () => {
     if (!result.ok) return
@@ -47,7 +50,8 @@ export default function Tool(_props: ToolProps) {
     <>
       <div class="tool-head">
         <h1>json.to.types</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_JSON)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> valid
           </span>
@@ -80,18 +84,12 @@ export default function Tool(_props: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setInput(SAMPLE_JSON)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={'Paste JSON here…\n\ne.g. {"name":"Ada","active":true}'}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 360 }}
@@ -111,7 +109,9 @@ export default function Tool(_props: ToolProps) {
               </button>
             </span>
           </div>
-          {result.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">Generated TypeScript interfaces appear here.</div>
+          ) : result.ok ? (
             <pre class="hl-block">{result.value}</pre>
           ) : (
             <div style={{ padding: 14 }}>

@@ -13,6 +13,7 @@
  */
 
 import { useMemo } from 'preact/hooks'
+import { Icon } from '../../icons/Icon'
 import type { Confidence } from './engine'
 import { useToolInput } from '../../storage/use-tool-input'
 import { identify } from './engine'
@@ -26,8 +27,9 @@ const CHIP_CLASS: Record<Confidence, string> = {
 }
 
 export default function Tool() {
-  const [input, setInput] = useToolInput('inspect.hashid', SAMPLE)
+  const [input, setInput] = useToolInput('inspect.hashid', '')
 
+  const isEmpty = input.trim() === ''
   const candidates = useMemo(() => identify(input), [input])
   const empty = candidates.length === 0
 
@@ -35,6 +37,7 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>hash.identify</h1>
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
         {!empty && (
           <span class="chip">
             {candidates.length} candidate{candidates.length === 1 ? '' : 's'}
@@ -54,14 +57,12 @@ export default function Tool() {
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
             </button>
-            <button class="btn ghost sm" type="button" onClick={() => setInput(SAMPLE)}>
-              sample
-            </button>
           </span>
         </div>
         <textarea
           class="area bare"
           value={input}
+          placeholder="Paste a hash string here…"
           onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
           spellcheck={false}
           style={{ minHeight: 96 }}
@@ -73,9 +74,11 @@ export default function Tool() {
           <span>candidates</span>
         </div>
         <div class="panel-b">
-          {empty ? (
+          {isEmpty ? (
+            <div class="tool-empty">Paste a hash string above to identify the algorithm.</div>
+          ) : empty ? (
             <div style={{ color: 'var(--muted)', fontSize: 12.5 }}>
-              Paste a hash to identify it.
+              No matching algorithm found.
             </div>
           ) : (
             candidates.map((c, i) => (

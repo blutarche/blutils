@@ -44,9 +44,15 @@ interface Match {
 }
 
 export default function Tool() {
-  const [pattern, setPattern] = useToolInput('inspect.regex.pattern', SAMPLE_PATTERN)
+  const [pattern, setPattern] = useToolInput('inspect.regex.pattern', '')
   const [flags, setFlags] = useToolInput('inspect.regex.flags', 'gi')
-  const [text, setText] = useToolInput('inspect.regex.text', SAMPLE_TEXT)
+  const [text, setText] = useToolInput('inspect.regex.text', '')
+
+  const loadSample = () => {
+    setPattern(SAMPLE_PATTERN)
+    setFlags('gi')
+    setText(SAMPLE_TEXT)
+  }
 
   const compiled = useMemo(() => {
     try {
@@ -57,7 +63,7 @@ export default function Tool() {
   }, [pattern, flags])
 
   const matches = useMemo<Match[]>(() => {
-    if (!compiled.re) return []
+    if (!compiled.re || !pattern) return []
     const re = compiled.re
     const out: Match[] = []
     if (re.global) {
@@ -102,11 +108,14 @@ export default function Tool() {
     setFlags(flags.includes(f) ? flags.replace(f, '') : flags + f)
   }
 
+  const isEmpty = !pattern && !text
+
   return (
     <>
       <div class="tool-head">
         <h1>regex.test</h1>
-        {compiled.error ? (
+        <button type="button" class="btn ghost sm" onClick={loadSample} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : compiled.error ? (
           <span class="chip bad">
             <Icon name="X" size={11} /> invalid
           </span>
@@ -140,6 +149,7 @@ export default function Tool() {
           <input
             class="input bare"
             value={pattern}
+            placeholder="your pattern here"
             onInput={(e) => setPattern((e.target as HTMLInputElement).value)}
             spellcheck={false}
           />
@@ -166,13 +176,6 @@ export default function Tool() {
               <button class="btn ghost sm" type="button" onClick={() => setText('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setText(SAMPLE_TEXT)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <div class="panel-b" style={{ padding: '8px 10px' }}>
@@ -180,6 +183,7 @@ export default function Tool() {
               class="area bare"
               style={{ minHeight: 180 }}
               value={text}
+              placeholder="Text to search…"
               onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
               spellcheck={false}
             />

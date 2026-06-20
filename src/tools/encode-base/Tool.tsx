@@ -45,9 +45,10 @@ function clampInt(n: number, lo: number, hi: number): number {
 
 export default function Tool({ initialState }: ToolProps) {
   const seededInput =
-    typeof initialState?.input === 'string' ? initialState.input : SAMPLE
+    typeof initialState?.input === 'string' ? initialState.input : ''
 
   const [input, setInput] = useToolInput('encode.base', seededInput)
+  const isEmpty = input.trim() === ''
   const [from, setFrom] = useSeededState<FromBase>('auto')
   const [target, setTarget] = useSeededState<number>(36)
 
@@ -70,7 +71,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>base.convert</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -106,13 +108,6 @@ export default function Tool({ initialState }: ToolProps) {
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
             </button>
-            <button
-              class="btn ghost sm"
-              type="button"
-              onClick={() => setInput(SAMPLE)}
-            >
-              sample
-            </button>
           </span>
         </div>
         <div class="panel-b">
@@ -133,25 +128,29 @@ export default function Tool({ initialState }: ToolProps) {
             <div class="panel-h">
               <span>output</span>
             </div>
-            <div class="panel-b">
-              {OUT_BASES.map(({ base, name }) => {
-                const text = result.empty ? '' : toBase(result.value, base)
-                return (
-                  <div key={base} class="hash-row">
-                    <span class="h-name">{name}</span>
-                    <code style={{ wordBreak: 'break-all' }}>{text}</code>
-                    <button
-                      class="btn ghost sm"
-                      type="button"
-                      disabled={!text}
-                      onClick={() => copy(text)}
-                    >
-                      <Icon name="Copy" size={11} />
-                    </button>
-                  </div>
-                )
-              })}
-            </div>
+            {isEmpty ? (
+              <div class="tool-empty">Converted values appear here.</div>
+            ) : (
+              <div class="panel-b">
+                {OUT_BASES.map(({ base, name }) => {
+                  const text = toBase(result.value, base)
+                  return (
+                    <div key={base} class="hash-row">
+                      <span class="h-name">{name}</span>
+                      <code style={{ wordBreak: 'break-all' }}>{text}</code>
+                      <button
+                        class="btn ghost sm"
+                        type="button"
+                        disabled={!text}
+                        onClick={() => copy(text)}
+                      >
+                        <Icon name="Copy" size={11} />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           <div class="panel">

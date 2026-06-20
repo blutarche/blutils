@@ -35,7 +35,9 @@ export default function Tool({ initialState }: ToolProps) {
 
   const [mode, setMode] = useSeededState<Mode>(seededMode)
   const [variant, setVariant] = useSeededState<Variant>('component')
-  const [input, setInput] = useToolInput('encode.url', SAMPLE_ENCODE)
+  const [input, setInput] = useToolInput('encode.url', '')
+
+  const isEmpty = input === ''
 
   const result = useMemo(() => {
     if (!input) return { ok: true as const, value: '' }
@@ -65,7 +67,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>url</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_ENCODE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -121,20 +124,12 @@ export default function Tool({ initialState }: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              {mode === 'encode' && (
-                <button
-                  class="btn ghost sm"
-                  type="button"
-                  onClick={() => setInput(SAMPLE_ENCODE)}
-                >
-                  sample
-                </button>
-              )}
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={mode === 'encode' ? 'Paste text to percent-encode…' : 'Paste encoded URL to decode…'}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 280 }}
@@ -154,7 +149,11 @@ export default function Tool({ initialState }: ToolProps) {
               </button>
             </span>
           </div>
-          {result.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">
+              {mode === 'encode' ? 'Encoded output appears here.' : 'Decoded text appears here.'}
+            </div>
+          ) : result.ok ? (
             <textarea
               readOnly
               class="area bare"

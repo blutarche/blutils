@@ -34,13 +34,15 @@ const SAMPLE_JSON = `{"id":"u_8421","name":"Ada","email":"ada@blutils.dev","plan
 type Indent = 0 | 2 | 4 | '\t'
 
 export default function Tool({ initialState }: ToolProps) {
-  const [input, setInput] = useToolInput('format.json', SAMPLE_JSON)
+  const [input, setInput] = useToolInput('format.json', '')
 
   const seededIndent: Indent =
     initialState && initialState.mode === 'minify' ? 0 : 2
 
   const [indent, setIndent] = useSeededState<Indent>(seededIndent)
   const [sortKeys, setSortKeys] = useSeededState<boolean>(false)
+
+  const isEmpty = input.trim() === ''
 
   const parsed = useMemo(() => {
     try {
@@ -77,7 +79,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>json.format</h1>
-        {parsed.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_JSON)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : parsed.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> valid
           </span>
@@ -139,18 +142,12 @@ export default function Tool({ initialState }: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setInput(SAMPLE_JSON)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={'Paste JSON here…\n\ne.g. {"hello": "world"}'}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 360 }}
@@ -170,7 +167,9 @@ export default function Tool({ initialState }: ToolProps) {
               </button>
             </span>
           </div>
-          {parsed.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">Formatted JSON appears here.</div>
+          ) : parsed.ok ? (
             <pre
               class="hl-block"
               dangerouslySetInnerHTML={{ __html: highlightedOutput }}

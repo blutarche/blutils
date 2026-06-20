@@ -43,8 +43,10 @@ const CHIP_LABEL: Record<ChangeType, string> = {
 }
 
 export default function Tool() {
-  const [a, setA] = useToolInput('inspect.jsondiff.a', SAMPLE_A)
-  const [b, setB] = useToolInput('inspect.jsondiff.b', SAMPLE_B)
+  const [a, setA] = useToolInput('inspect.jsondiff.a', '')
+  const [b, setB] = useToolInput('inspect.jsondiff.b', '')
+
+  const isEmpty = a.trim() === '' && b.trim() === ''
 
   const result = useMemo(() => parseAndDiff(a, b), [a, b])
 
@@ -52,7 +54,8 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>json.diff</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => { setA(SAMPLE_A); setB(SAMPLE_B) }} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : result.ok ? (
           <span class="chip">
             {result.changes.length}{' '}
             {result.changes.length === 1 ? 'change' : 'changes'}
@@ -88,6 +91,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={a}
+            placeholder={'Paste original JSON here…\n\ne.g. {"name":"Ada"}'}
             onInput={(e) => setA((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 160 }}
@@ -100,6 +104,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={b}
+            placeholder={'Paste modified JSON here…\n\ne.g. {"name":"Bea"}'}
             onInput={(e) => setB((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 160 }}
@@ -107,7 +112,9 @@ export default function Tool() {
         </div>
       </div>
 
-      {!result.ok ? (
+      {isEmpty ? (
+        <div class="tool-empty">Diff results appear here once both inputs contain JSON.</div>
+      ) : !result.ok ? (
         <div class="json-error">{result.error}</div>
       ) : result.changes.length === 0 ? (
         <div class="json-error">

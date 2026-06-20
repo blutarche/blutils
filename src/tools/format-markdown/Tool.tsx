@@ -34,6 +34,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-markdown'
 import 'prismjs/components/prism-diff'
 import { useToolInput } from '../../storage/use-tool-input'
+import { Icon } from '../../icons/Icon'
 
 const LANG_ALIAS: Record<string, string> = {
   js: 'javascript',
@@ -95,19 +96,25 @@ marked.use({
 })
 
 export default function Tool() {
-  const [text, setText] = useToolInput('format.markdown', SAMPLE)
+  const [text, setText] = useToolInput('format.markdown', '')
+
+  const isEmpty = text.trim() === ''
 
   const html = useMemo(() => {
+    if (isEmpty) return ''
     const raw = marked.parse(text, { async: false }) as string
     if (typeof window === 'undefined') return raw
     return DOMPurify.sanitize(raw)
-  }, [text])
+  }, [text, isEmpty])
 
   return (
     <>
       <div class="tool-head">
         <h1>markdown.preview</h1>
-        <span class="chip">{text.split('\n').length} lines</span>
+        <button type="button" class="btn ghost sm" onClick={() => setText(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : (
+          <span class="chip">{text.split('\n').length} lines</span>
+        )}
         <div style={{ flex: 1 }} />
       </div>
       <p class="tool-sub">CommonMark, sanitised, rendered as you type.</p>
@@ -116,10 +123,16 @@ export default function Tool() {
         <div class="panel">
           <div class="panel-h">
             <span>source</span>
+            <span class="actions">
+              <button class="btn ghost sm" type="button" onClick={() => setText('')}>
+                clear
+              </button>
+            </span>
           </div>
           <textarea
             class="area bare"
             value={text}
+            placeholder={'Paste Markdown here…\n\ne.g. # Hello **world**'}
             onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 380 }}
@@ -129,10 +142,14 @@ export default function Tool() {
           <div class="panel-h">
             <span>preview</span>
           </div>
-          <div
-            class="panel-b md-prev"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          {isEmpty ? (
+            <div class="tool-empty">Rendered preview appears here.</div>
+          ) : (
+            <div
+              class="panel-b md-prev"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          )}
         </div>
       </div>
     </>

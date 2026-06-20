@@ -23,8 +23,10 @@ const SAMPLE = '192.168.1.10/24'
 
 export default function Tool({ initialState }: ToolProps) {
   const seed =
-    typeof initialState?.input === 'string' ? initialState.input : SAMPLE
+    typeof initialState?.input === 'string' ? initialState.input : ''
   const [input, setInput] = useToolInput('inspect.cidr', seed)
+
+  const isEmpty = input.trim() === ''
 
   const parsed = useMemo(() => {
     try {
@@ -63,7 +65,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>ip.cidr</h1>
-        {parsed.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && (parsed.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> valid
           </span>
@@ -71,8 +74,8 @@ export default function Tool({ initialState }: ToolProps) {
           <span class="chip bad">
             <Icon name="X" size={11} /> invalid
           </span>
-        )}
-        {parsed.ok && (
+        ))}
+        {!isEmpty && parsed.ok && (
           <span class="chip">
             {parsed.value.isPrivate ? 'private' : 'public'}
           </span>
@@ -88,9 +91,6 @@ export default function Tool({ initialState }: ToolProps) {
           <span class="actions">
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
-            </button>
-            <button class="btn ghost sm" type="button" onClick={() => setInput(SAMPLE)}>
-              sample
             </button>
           </span>
         </div>
@@ -110,7 +110,9 @@ export default function Tool({ initialState }: ToolProps) {
           <span>subnet</span>
         </div>
         <div class="panel-b">
-          {parsed.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">Enter a CIDR block to see subnet details.</div>
+          ) : parsed.ok ? (
             <dl class="kv" style={{ gridTemplateColumns: '110px 1fr auto' }}>
               {rows.map((r) => (
                 <>

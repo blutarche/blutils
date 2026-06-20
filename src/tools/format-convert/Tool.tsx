@@ -32,7 +32,7 @@ function isFormat(x: unknown): x is Format {
 }
 
 export default function Tool({ initialState }: ToolProps) {
-  const [input, setInput] = useToolInput('format.convert', SAMPLE_JSON)
+  const [input, setInput] = useToolInput('format.convert', '')
 
   const seededFrom: Format = isFormat(initialState?.from)
     ? initialState.from
@@ -67,7 +67,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>format.convert</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_JSON)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {input.trim() === '' ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -117,18 +118,12 @@ export default function Tool({ initialState }: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setInput(SAMPLE_JSON)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={`Paste ${from.toUpperCase()} here…`}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 360 }}
@@ -148,7 +143,9 @@ export default function Tool({ initialState }: ToolProps) {
               </button>
             </span>
           </div>
-          {result.ok ? (
+          {input.trim() === '' ? (
+            <div class="tool-empty">Converted output appears here.</div>
+          ) : result.ok ? (
             <textarea
               class="area bare"
               value={result.value}

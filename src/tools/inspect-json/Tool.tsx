@@ -28,8 +28,10 @@ const INDENT_PX = 16
 
 export default function Tool({ initialState }: ToolProps) {
   const seed =
-    typeof initialState?.input === 'string' ? initialState.input : SAMPLE_JSON
+    typeof initialState?.input === 'string' ? initialState.input : ''
   const [input, setInput] = useToolInput('inspect.json', seed)
+
+  const isEmpty = input.trim() === ''
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -80,7 +82,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>json.tree</h1>
-        {parsed.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_JSON)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && (parsed.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> valid
           </span>
@@ -88,7 +91,7 @@ export default function Tool({ initialState }: ToolProps) {
           <span class="chip bad">
             <Icon name="X" size={11} /> invalid
           </span>
-        )}
+        ))}
         <div style={{ flex: 1 }} />
         <button type="button" class="btn" onClick={expandAll} disabled={!parsed.ok}>
           <Icon name="Plus" size={11} /> expand all
@@ -110,18 +113,12 @@ export default function Tool({ initialState }: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setInput(SAMPLE_JSON)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={'Paste JSON here…\n\ne.g. {"hello": "world"}'}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 360 }}
@@ -131,7 +128,9 @@ export default function Tool({ initialState }: ToolProps) {
           <div class="panel-h">
             <span>tree</span>
           </div>
-          {parsed.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">JSON tree appears here.</div>
+          ) : parsed.ok ? (
             <div
               class="panel-b"
               style={{

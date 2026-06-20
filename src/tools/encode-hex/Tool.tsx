@@ -32,7 +32,9 @@ export default function Tool({ initialState }: ToolProps) {
   const [mode, setMode] = useSeededState<Mode>(seededMode)
   const [upper, setUpper] = useSeededState<boolean>(false)
   const [delimited, setDelimited] = useSeededState<boolean>(false)
-  const [input, setInput] = useToolInput('encode.hex', SAMPLE)
+  const [input, setInput] = useToolInput('encode.hex', '')
+
+  const isEmpty = input === ''
 
   const result = useMemo(() => {
     if (!input) return { ok: true as const, value: '', text: '' }
@@ -67,7 +69,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>hex</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -133,20 +136,12 @@ export default function Tool({ initialState }: ToolProps) {
               >
                 clear
               </button>
-              {mode === 'encode' && (
-                <button
-                  class="btn ghost sm"
-                  type="button"
-                  onClick={() => setInput(SAMPLE)}
-                >
-                  sample
-                </button>
-              )}
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={mode === 'encode' ? 'Paste text to convert to hex…' : 'Paste hex to decode…'}
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 280 }}
@@ -166,7 +161,11 @@ export default function Tool({ initialState }: ToolProps) {
               </button>
             </span>
           </div>
-          {result.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">
+              {mode === 'encode' ? 'Hex output appears here.' : 'Decoded text appears here.'}
+            </div>
+          ) : result.ok ? (
             <textarea
               readOnly
               class="area bare"
@@ -186,13 +185,17 @@ export default function Tool({ initialState }: ToolProps) {
         <div class="panel-h">
           <span>hexdump</span>
         </div>
-        <textarea
-          readOnly
-          class="area bare"
-          value={dump}
-          spellcheck={false}
-          style={{ minHeight: 160 }}
-        />
+        {isEmpty ? (
+          <div class="tool-empty">Hexdump appears here.</div>
+        ) : (
+          <textarea
+            readOnly
+            class="area bare"
+            value={dump}
+            spellcheck={false}
+            style={{ minHeight: 160 }}
+          />
+        )}
       </div>
     </>
   )

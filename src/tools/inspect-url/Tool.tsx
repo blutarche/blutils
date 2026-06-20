@@ -23,8 +23,10 @@ const SAMPLE = 'https://user:pass@example.com:8443/a/b?x=1&y=2&x=3#frag'
 
 export default function Tool({ initialState }: ToolProps) {
   const seed =
-    typeof initialState?.input === 'string' ? initialState.input : SAMPLE
+    typeof initialState?.input === 'string' ? initialState.input : ''
   const [input, setInput] = useToolInput('inspect.url', seed)
+
+  const isEmpty = input.trim() === ''
 
   const parsed = useMemo(() => {
     try {
@@ -61,7 +63,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>url.parse</h1>
-        {parsed.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && (parsed.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> valid
           </span>
@@ -69,8 +72,8 @@ export default function Tool({ initialState }: ToolProps) {
           <span class="chip bad">
             <Icon name="X" size={11} /> invalid
           </span>
-        )}
-        {parsed.ok && (
+        ))}
+        {!isEmpty && parsed.ok && (
           <span class="chip">
             {params.length} {params.length === 1 ? 'param' : 'params'}
           </span>
@@ -87,9 +90,6 @@ export default function Tool({ initialState }: ToolProps) {
           <span class="actions">
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
-            </button>
-            <button class="btn ghost sm" type="button" onClick={() => setInput(SAMPLE)}>
-              sample
             </button>
           </span>
         </div>
@@ -109,7 +109,9 @@ export default function Tool({ initialState }: ToolProps) {
           <span>components</span>
         </div>
         <div class="panel-b">
-          {parsed.ok ? (
+          {isEmpty ? (
+            <div class="tool-empty">Paste a URL above to see its components.</div>
+          ) : parsed.ok ? (
             <dl class="kv" style={{ gridTemplateColumns: '110px 1fr auto' }}>
               {rows.map((r) => (
                 <>
@@ -138,7 +140,7 @@ export default function Tool({ initialState }: ToolProps) {
         </div>
       </div>
 
-      {parsed.ok && (
+      {!isEmpty && parsed.ok && (
         <div class="panel">
           <div class="panel-h">
             <span>query params</span>

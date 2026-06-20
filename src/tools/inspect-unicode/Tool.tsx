@@ -30,8 +30,9 @@ const SAMPLE = 'Hi 👋 café'
 const ROW_COLS = '48px 88px 88px 1fr 1fr'
 
 export default function Tool() {
-  const [input, setInput] = useToolInput('inspect.unicode', SAMPLE)
+  const [input, setInput] = useToolInput('inspect.unicode', '')
 
+  const isEmpty = input === ''
   const rows = useMemo(() => inspect(input), [input])
   const points = useMemo(() => codePointCount(input), [input])
   const units = useMemo(() => codeUnitCount(input), [input])
@@ -46,12 +47,17 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>unicode.inspect</h1>
-        <span class="chip info">
-          {points} code point{points === 1 ? '' : 's'}
-        </span>
-        <span class="chip">
-          {units} UTF-16 unit{units === 1 ? '' : 's'}
-        </span>
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && (
+          <span class="chip info">
+            {points} code point{points === 1 ? '' : 's'}
+          </span>
+        )}
+        {!isEmpty && (
+          <span class="chip">
+            {units} UTF-16 unit{units === 1 ? '' : 's'}
+          </span>
+        )}
       </div>
       <p class="tool-sub">
         Every code point with its U+ hex, decimal, JS escape, and UTF-8 bytes.
@@ -70,18 +76,12 @@ export default function Tool() {
             >
               clear
             </button>
-            <button
-              class="btn ghost sm"
-              type="button"
-              onClick={() => setInput(SAMPLE)}
-            >
-              sample
-            </button>
           </span>
         </div>
         <textarea
           class="area bare"
           value={input}
+          placeholder="Type or paste text to inspect…"
           onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
           spellcheck={false}
           style={{ minHeight: 96 }}
@@ -90,11 +90,7 @@ export default function Tool() {
 
       {rows.length === 0 ? (
         <div class="panel">
-          <div class="panel-b">
-            <div class="palette-empty" style={{ padding: 20 }}>
-              type or paste text to inspect
-            </div>
-          </div>
+          <div class="tool-empty">Type or paste text to see its Unicode code points.</div>
         </div>
       ) : (
         <div class="panel">

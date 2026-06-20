@@ -25,9 +25,9 @@ const SAMPLE = 'https://utils.blutarche.dev'
 const QR_SIZE = 220
 
 export default function Tool() {
-  const [text, setText] = useToolInput('generate.qr', SAMPLE)
+  const [text, setText] = useToolInput('generate.qr', '')
 
-  const svgMarkup = useMemo(() => buildSvg(text), [text])
+  const svgMarkup = useMemo(() => (text ? buildSvg(text) : ''), [text])
 
   const copyText = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -39,6 +39,7 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>qr.encode</h1>
+        <button type="button" class="btn ghost sm" onClick={() => setText(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
         <span class="chip">{text.length} chars</span>
         <div style={{ flex: 1 }} />
       </div>
@@ -59,6 +60,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={text}
+            placeholder="Text or URL to encode…"
             onInput={(e) => setText((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 200 }}
@@ -74,18 +76,24 @@ export default function Tool() {
             </span>
           </div>
           <div class="panel-b">
-            <div class="qr-out" dangerouslySetInnerHTML={{ __html: svgMarkup }} />
-            <div
-              style={{
-                marginTop: 10,
-                textAlign: 'center',
-                color: 'var(--muted)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-              }}
-            >
-              error correction · M · auto version
-            </div>
+            {text ? (
+              <>
+                <div class="qr-out" dangerouslySetInnerHTML={{ __html: svgMarkup }} />
+                <div
+                  style={{
+                    marginTop: 10,
+                    textAlign: 'center',
+                    color: 'var(--muted)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                  }}
+                >
+                  error correction · M · auto version
+                </div>
+              </>
+            ) : (
+              <div class="tool-empty">Your QR code appears here.</div>
+            )}
           </div>
         </div>
       </div>

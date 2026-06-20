@@ -149,6 +149,24 @@
 
 .area:focus { border-color: var(--accent-bd); }
 
+.area::placeholder,
+.input::placeholder {
+  color: var(--muted-2);
+  /* Keep multi-line example hints from overflowing the textarea. */
+  white-space: pre-line;
+}
+
+/* Neutral "nothing entered yet" state for output panels — distinct
+ * from .json-error (which signals a real parse failure). Sits where
+ * a result would render before the user types or loads a sample. */
+.tool-empty {
+  padding: 20px 14px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
 .area.bare {
   border: 0;
   border-radius: 0;

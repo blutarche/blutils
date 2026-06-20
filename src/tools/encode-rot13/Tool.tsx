@@ -28,9 +28,10 @@ function clampShift(n: number): number {
 }
 
 export default function Tool() {
-  const [input, setInput] = useToolInput('encode.rot13', SAMPLE)
+  const [input, setInput] = useToolInput('encode.rot13', '')
   const [shift, setShift] = useSeededState<number>(13)
 
+  const isEmpty = input === ''
   const output = useMemo(() => caesar(input, shift), [input, shift])
   const decodeShift = (26 - shift) % 26
 
@@ -44,7 +45,8 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>rot13.caesar</h1>
-        <span class="chip">shift {shift}</span>
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && <span class="chip">shift {shift}</span>}
         <div style={{ flex: 1 }} />
         <button
           type="button"
@@ -100,18 +102,12 @@ export default function Tool() {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              <button
-                class="btn ghost sm"
-                type="button"
-                onClick={() => setInput(SAMPLE)}
-              >
-                sample
-              </button>
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder="Type or paste text to rotate…"
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 280 }}
@@ -126,13 +122,17 @@ export default function Tool() {
               </button>
             </span>
           </div>
-          <textarea
-            readOnly
-            class="area bare"
-            value={output}
-            spellcheck={false}
-            style={{ minHeight: 280 }}
-          />
+          {isEmpty ? (
+            <div class="tool-empty">Rotated text appears here.</div>
+          ) : (
+            <textarea
+              readOnly
+              class="area bare"
+              value={output}
+              spellcheck={false}
+              style={{ minHeight: 280 }}
+            />
+          )}
         </div>
       </div>
     </>

@@ -45,10 +45,12 @@ interface Row {
 }
 
 export default function Tool() {
-  const [a, setA] = useToolInput('text.diff.a', SAMPLE_A)
-  const [b, setB] = useToolInput('text.diff.b', SAMPLE_B)
+  const [a, setA] = useToolInput('text.diff.a', '')
+  const [b, setB] = useToolInput('text.diff.b', '')
   const [ignoreWs, setIgnoreWs] = useSeededState<boolean>(false)
   const [mode, setMode] = useSeededState<Mode>('line')
+
+  const isEmpty = a.trim() === '' && b.trim() === ''
 
   const lineResult = useMemo(() => {
     if (mode !== 'line') return null
@@ -124,9 +126,10 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>text.diff</h1>
-        {stats && <span class="chip ok">+{stats.add}</span>}
-        {stats && <span class="chip bad">−{stats.del}</span>}
-        {stats && <span class="chip">{stats.eq} unchanged</span>}
+        <button type="button" class="btn ghost sm" onClick={() => { setA(SAMPLE_A); setB(SAMPLE_B) }} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && stats && <span class="chip ok">+{stats.add}</span>}
+        {!isEmpty && stats && <span class="chip bad">−{stats.del}</span>}
+        {!isEmpty && stats && <span class="chip">{stats.eq} unchanged</span>}
         <div style={{ flex: 1 }} />
         <div class="seg-ctrl">
           <button
@@ -174,6 +177,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={a}
+            placeholder="Original text…"
             onInput={(e) => setA((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 140 }}
@@ -186,6 +190,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={b}
+            placeholder="Modified text…"
             onInput={(e) => setB((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 140 }}
@@ -193,7 +198,9 @@ export default function Tool() {
         </div>
       </div>
 
-      {!result ? (
+      {isEmpty ? (
+        <div class="tool-empty">Paste text into both panels to see the diff.</div>
+      ) : !result ? (
         <div class="json-error">
           Diff too large to render — the LCS table cap is {(250_000).toLocaleString()} cells.
           {mode === 'char' && ' Switch to line mode or shorten the inputs.'}

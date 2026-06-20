@@ -34,10 +34,12 @@ banana
 `
 
 export default function Tool() {
-  const [text, setText] = useToolInput('text.lines', SAMPLE)
+  const [text, setText] = useToolInput('text.lines', '')
   const [result, setResult] = useState(text)
   const [caseInsensitive, setCaseInsensitive] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const isEmpty = text.trim() === ''
 
   const inLines = lineCount(text)
   const outLines = lineCount(result)
@@ -61,7 +63,8 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>text.lines</h1>
-        <span class="chip">{inLines} lines</span>
+        <button type="button" class="btn ghost sm" onClick={() => editSource(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {!isEmpty && <span class="chip">{inLines} lines</span>}
         <div style={{ flex: 1 }} />
         <button
           type="button"
@@ -125,6 +128,7 @@ export default function Tool() {
           <textarea
             class="area bare"
             value={text}
+            placeholder="Paste lines here…"
             onInput={(e) => editSource((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 240 }}
@@ -134,19 +138,23 @@ export default function Tool() {
           <div class="panel-h">
             <span>output</span>
             <span class="actions">
-              <span class="chip">{outLines} lines</span>
-              <button class="btn ghost sm" type="button" onClick={copy}>
+              {!isEmpty && <span class="chip">{outLines} lines</span>}
+              <button class="btn ghost sm" type="button" onClick={copy} disabled={isEmpty}>
                 <Icon name={copied ? 'Check' : 'Copy'} size={11} /> copy
               </button>
             </span>
           </div>
-          <textarea
-            class="area bare"
-            value={result}
-            readOnly
-            spellcheck={false}
-            style={{ minHeight: 240 }}
-          />
+          {isEmpty ? (
+            <div class="tool-empty">Transformed lines appear here.</div>
+          ) : (
+            <textarea
+              class="area bare"
+              value={result}
+              readOnly
+              spellcheck={false}
+              style={{ minHeight: 240 }}
+            />
+          )}
         </div>
       </div>
     </>

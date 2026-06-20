@@ -28,7 +28,7 @@ function str(v: unknown): string | null {
 }
 
 export default function Tool({ initialState }: ToolProps) {
-  const seed = typeof initialState?.input === 'string' ? initialState.input : SAMPLE
+  const seed = typeof initialState?.input === 'string' ? initialState.input : ''
   const [input, setInput] = useToolInput('inspect.jwt', seed)
 
   const parsed = useMemo(() => {
@@ -64,11 +64,14 @@ export default function Tool({ initialState }: ToolProps) {
     }
   }
 
+  const isEmpty = !input.trim()
+
   return (
     <>
       <div class="tool-head">
         <h1>jwt.decode</h1>
-        {parsed.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {isEmpty ? null : parsed.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -91,9 +94,6 @@ export default function Tool({ initialState }: ToolProps) {
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
             </button>
-            <button class="btn ghost sm" type="button" onClick={() => setInput(SAMPLE)}>
-              sample
-            </button>
           </span>
         </div>
         <div class="panel-b">
@@ -108,13 +108,15 @@ export default function Tool({ initialState }: ToolProps) {
         </div>
       </div>
 
-      {!parsed.ok && (
+      {isEmpty ? (
+        <div class="tool-empty">Decoded header, payload, and claims appear here.</div>
+      ) : !parsed.ok ? (
         <div class="panel">
           <div class="panel-b">
             <div class="json-error">{parsed.error}</div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {decoded && (
         <>

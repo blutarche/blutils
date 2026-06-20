@@ -38,7 +38,7 @@ export default function Tool({ initialState }: ToolProps) {
   const seededMode: Mode = initialState?.mode === 'toEnv' ? 'toEnv' : 'toJson'
 
   const [mode, setMode] = useSeededState<Mode>(seededMode)
-  const [input, setInput] = useToolInput('format.dotenv', SAMPLE_ENV)
+  const [input, setInput] = useToolInput('format.dotenv', '')
 
   const result = useMemo(() => {
     if (!input.trim()) return { ok: true as const, value: '' }
@@ -61,7 +61,8 @@ export default function Tool({ initialState }: ToolProps) {
     <>
       <div class="tool-head">
         <h1>env.json</h1>
-        {result.ok ? (
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE_ENV)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
+        {input.trim() === '' ? null : result.ok ? (
           <span class="chip ok">
             <Icon name="Check" size={11} /> ok
           </span>
@@ -100,20 +101,16 @@ export default function Tool({ initialState }: ToolProps) {
               <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
                 clear
               </button>
-              {mode === 'toJson' && (
-                <button
-                  class="btn ghost sm"
-                  type="button"
-                  onClick={() => setInput(SAMPLE_ENV)}
-                >
-                  sample
-                </button>
-              )}
             </span>
           </div>
           <textarea
             class="area bare"
             value={input}
+            placeholder={
+              mode === 'toJson'
+                ? 'Paste .env content here…\n\ne.g. KEY=value'
+                : 'Paste JSON object here…\n\ne.g. {"KEY":"value"}'
+            }
             onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
             spellcheck={false}
             style={{ minHeight: 320 }}
@@ -133,7 +130,9 @@ export default function Tool({ initialState }: ToolProps) {
               </button>
             </span>
           </div>
-          {result.ok ? (
+          {input.trim() === '' ? (
+            <div class="tool-empty">Converted output appears here.</div>
+          ) : result.ok ? (
             <textarea
               readOnly
               class="area bare"

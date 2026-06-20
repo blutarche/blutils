@@ -30,7 +30,7 @@ interface Opts {
 
 const DEFAULTS: Opts = {
   header: '{\n  "alg": "HS256",\n  "typ": "JWT"\n}',
-  payload: '{\n  "sub": "1234567890",\n  "name": "John Doe",\n  "iat": 1516239022\n}',
+  payload: '',
   secret: 'your-256-bit-secret',
   algo: 'HS256',
 }
@@ -63,6 +63,11 @@ export default function Tool() {
     setRaw(JSON.stringify({ ...opts, ...patch }))
 
   useEffect(() => {
+    if (opts.payload.trim() === '') {
+      setToken('')
+      setError(null)
+      return
+    }
     let cancelled = false
     ;(async () => {
       let header: Record<string, unknown>
@@ -114,7 +119,7 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>jwt.sign</h1>
-        {error ? (
+        {opts.payload.trim() === '' ? null : error ? (
           <span class="chip bad">
             <Icon name="X" size={11} /> invalid
           </span>
@@ -237,7 +242,11 @@ export default function Tool() {
           </span>
         </div>
         <div class="panel-b">
-          <code style={{ wordBreak: 'break-all' }}>{token || '…'}</code>
+          {opts.payload.trim() === '' ? (
+            <div class="tool-empty">Signed token appears here.</div>
+          ) : (
+            <code style={{ wordBreak: 'break-all' }}>{token || '…'}</code>
+          )}
         </div>
       </div>
     </>

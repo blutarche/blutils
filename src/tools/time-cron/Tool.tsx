@@ -27,8 +27,9 @@ const PRESETS: ReadonlyArray<readonly [string, string]> = [
 ]
 
 export default function Tool() {
-  const [expr, setExpr] = useToolInput('time.cron', '*/15 9-17 * * 1-5')
+  const [expr, setExpr] = useToolInput('time.cron', '')
 
+  const isEmpty = expr.trim() === ''
   const parts = useMemo(() => expr.trim().split(/\s+/), [expr])
   const valid = parts.length === 5
   const explanation = useMemo(
@@ -41,7 +42,7 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>cron.parse</h1>
-        {valid && explanation ? (
+        {isEmpty ? null : valid && explanation ? (
           <span class="chip ok">valid</span>
         ) : (
           <span class="chip bad">
@@ -62,6 +63,7 @@ export default function Tool() {
           <input
             class="input"
             value={expr}
+            placeholder="* * * * *"
             onInput={(e) => setExpr((e.target as HTMLInputElement).value)}
             spellcheck={false}
           />
@@ -91,32 +93,36 @@ export default function Tool() {
           <span>next 6 runs</span>
         </div>
         <div class="panel-b">
-          <ol class="cron-runs">
-            {next.map((d, i) => {
-              const minsAhead = Math.round((d.getTime() - Date.now()) / 60_000)
-              const rel =
-                minsAhead < 60
-                  ? `in ${minsAhead} min`
-                  : minsAhead < 1440
-                    ? `in ${Math.round(minsAhead / 60)} hr`
-                    : `in ${Math.round(minsAhead / 1440)} d`
-              return (
-                <li key={i}>
-                  <span class="rn">#{i + 1}</span>
-                  <span class="rt">
-                    {d.toLocaleString(undefined, {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    })}
-                  </span>
-                  <span class="rd">{rel}</span>
-                </li>
-              )
-            })}
-            {!next.length && (
-              <li style={{ display: 'block', color: 'var(--muted)' }}>parse error</li>
-            )}
-          </ol>
+          {isEmpty ? (
+            <div class="tool-empty">Enter an expression or pick a preset.</div>
+          ) : (
+            <ol class="cron-runs">
+              {next.map((d, i) => {
+                const minsAhead = Math.round((d.getTime() - Date.now()) / 60_000)
+                const rel =
+                  minsAhead < 60
+                    ? `in ${minsAhead} min`
+                    : minsAhead < 1440
+                      ? `in ${Math.round(minsAhead / 60)} hr`
+                      : `in ${Math.round(minsAhead / 1440)} d`
+                return (
+                  <li key={i}>
+                    <span class="rn">#{i + 1}</span>
+                    <span class="rt">
+                      {d.toLocaleString(undefined, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
+                    </span>
+                    <span class="rd">{rel}</span>
+                  </li>
+                )
+              })}
+              {!next.length && (
+                <li style={{ display: 'block', color: 'var(--muted)' }}>parse error</li>
+              )}
+            </ol>
+          )}
         </div>
       </div>
     </>

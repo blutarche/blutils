@@ -31,10 +31,14 @@ type Digests = {
 const EMPTY: Digests = { md5: '', sha1: '', sha256: '', sha512: '' }
 
 export default function Tool() {
-  const [input, setInput] = useToolInput('hash.generate', SAMPLE)
+  const [input, setInput] = useToolInput('hash.generate', '')
   const [digests, setDigests] = useState<Digests>(EMPTY)
 
   useEffect(() => {
+    if (input === '') {
+      setDigests(EMPTY)
+      return
+    }
     let cancelled = false
     ;(async () => {
       try {
@@ -74,6 +78,7 @@ export default function Tool() {
     <>
       <div class="tool-head">
         <h1>hash.generate</h1>
+        <button type="button" class="btn ghost sm" onClick={() => setInput(SAMPLE)} title="Load sample" aria-label="Load sample"><Icon name="Sparkles" size={13} /></button>
         <span class="chip">{inputBytes} bytes in</span>
         <div style={{ flex: 1 }} />
       </div>
@@ -89,14 +94,12 @@ export default function Tool() {
             <button class="btn ghost sm" type="button" onClick={() => setInput('')}>
               clear
             </button>
-            <button class="btn ghost sm" type="button" onClick={() => setInput(SAMPLE)}>
-              sample
-            </button>
           </span>
         </div>
         <textarea
           class="area bare"
           value={input}
+          placeholder="Text to hash…"
           onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
           spellcheck={false}
           style={{ minHeight: 96 }}

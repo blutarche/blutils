@@ -34,7 +34,7 @@ interface Opts {
 }
 
 const DEFAULTS: Opts = {
-  message: 'The quick brown fox jumps over the lazy dog',
+  message: '',
   key: 'secret',
   keyEncoding: 'utf-8',
   algo: 'SHA-256',
@@ -226,6 +226,8 @@ export default function Tool() {
               The key is not valid {opts.keyEncoding}. Fix it or switch the key
               encoding.
             </span>
+          ) : opts.message === '' ? (
+            <div class="tool-empty">HMAC appears here.</div>
           ) : (
             <code style={{ wordBreak: 'break-all' }}>{result || '…'}</code>
           )}
