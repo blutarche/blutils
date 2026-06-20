@@ -77,6 +77,12 @@
   --tabs-h:      34px;
   --statusbar-h: 24px;
 
+  /* Max measure for the workspace content column. The shell chrome
+   * (sidebar rail, header bar, status bar) stays full-bleed; only the
+   * readable content is capped + centred at this width so the UI
+   * doesn't sprawl edge-to-edge on ultra-wide monitors. */
+  --content-max: 1440px;
+
   /* Type families */
   --font:      'Space Grotesk', 'Helvetica Neue', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;

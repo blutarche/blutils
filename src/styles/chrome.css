@@ -348,7 +348,8 @@
   align-items: center;
   gap: 14px;
   height: var(--statusbar-h);
-  padding: 0 14px;
+  /* Bar stays full-bleed; its content aligns to the centred measure. */
+  padding: 0 max(14px, (100% - var(--content-max)) / 2);
   background: var(--chrome-bg);
   border-top: 1px solid var(--chrome-border);
   font-family: var(--font-mono);

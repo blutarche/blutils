@@ -14,7 +14,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 18px;
+  /* Match the content column's centred gutter so the breadcrumb and
+   * commands button line up with the content edges on wide screens. */
+  padding: 0 max(18px, (100% - var(--content-max)) / 2);
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
@@ -109,7 +111,10 @@
 .main-inner {
   flex: 1;
   overflow-y: auto;
-  padding: 28px 36px 56px;
+  /* The horizontal gutter grows past its 36px floor once the column
+   * is wider than --content-max, centring the content while the
+   * scrollbar stays pinned to the true right edge. */
+  padding: 28px max(36px, (100% - var(--content-max)) / 2) 56px;
   scrollbar-width: thin;
   scrollbar-color: var(--line-2) transparent;
 }
@@ -482,8 +487,10 @@
  * This is the primary discovery surface (and the main nav on
  * mobile, where the Sidebar is tucked behind the menu). */
 
+/* The catalog shares the global content measure (capped + centred by
+ * .main-inner), so it no longer needs its own cap. */
 .home {
-  max-width: 1100px;
+  max-width: none;
 }
 
 .home-hero {
