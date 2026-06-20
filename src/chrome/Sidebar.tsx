@@ -194,9 +194,11 @@ export function Sidebar({ activeToolId, onCloseNav, trapFocus = false }: Sidebar
         </a>
         <span>mit</span>
         <span class="side-foot-dot" />
+        {/* Points at the GitHub profile until the blutarche.dev landing
+            page exists. */}
         <a
           class="side-foot-link"
-          href="https://blutarche.dev"
+          href="https://github.com/blutarche"
           target="_blank"
           rel="noopener noreferrer"
         >
