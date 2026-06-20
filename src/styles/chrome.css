@@ -388,6 +388,25 @@
   color: var(--chrome-muted);
 }
 
+/* Transient copy proof — flashes in the context-label slot after a
+ * clipboard write, then fades back. The brief accent flash reassures
+ * that the (otherwise invisible) copy actually happened. */
+.status .seg-copied {
+  color: var(--ok);
+  animation: seg-copied-in 160ms ease-out;
+}
+
+@keyframes seg-copied-in {
+  from {
+    opacity: 0;
+    transform: translateY(1px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .status .dot {
   width: 5px;
   height: 5px;

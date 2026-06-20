@@ -18,6 +18,7 @@
 
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { signJwt, type JwtAlgo } from './engine'
 
@@ -108,8 +109,7 @@ export default function Tool() {
 
   const copy = () => {
     if (!token) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(token).catch(() => {})
+    if (copyText(token)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 900)
     }

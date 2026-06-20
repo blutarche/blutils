@@ -22,6 +22,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { JSX } from 'preact'
 import { Icon } from '../icons/Icon'
+import { copyText } from '../clipboard/copy'
 import { isIconName, type IconName } from '../icons/icon-set'
 import { bestMatch, fuzzyMatch, type Range } from './fuzzy'
 import {
@@ -174,9 +175,7 @@ export function Palette({ onClose }: { onClose: () => void }) {
         name: 'Copy permalink',
         desc: 'copy this tool’s URL to the clipboard',
         run: () => {
-          if (typeof navigator !== 'undefined' && navigator.clipboard) {
-            navigator.clipboard.writeText(window.location.href).catch(() => {})
-          }
+          copyText(window.location.href)
           onClose()
         },
       },

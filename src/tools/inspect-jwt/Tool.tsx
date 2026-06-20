@@ -16,6 +16,7 @@
 import { useMemo } from 'preact/hooks'
 import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { decodeJwt, interpretClaims } from './engine'
 
@@ -59,9 +60,7 @@ export default function Tool({ initialState }: ToolProps) {
   const typ = decoded ? str(decoded.header.typ) : null
 
   const copy = (s: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(s).catch(() => {})
-    }
+    copyText(s)
   }
 
   const isEmpty = !input.trim()

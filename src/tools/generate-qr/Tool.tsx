@@ -19,6 +19,7 @@
 import { useMemo } from 'preact/hooks'
 import qrcode from 'qrcode-generator'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 
 const SAMPLE = 'https://utils.blutarche.dev'
@@ -28,12 +29,6 @@ export default function Tool() {
   const [text, setText] = useToolInput('generate.qr', '')
 
   const svgMarkup = useMemo(() => (text ? buildSvg(text) : ''), [text])
-
-  const copyText = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
-    }
-  }
 
   return (
     <>
@@ -70,7 +65,7 @@ export default function Tool() {
           <div class="panel-h">
             <span>qr</span>
             <span class="actions">
-              <button class="btn ghost sm" type="button" onClick={copyText}>
+              <button class="btn ghost sm" type="button" onClick={() => copyText(text)}>
                 <Icon name="Copy" size={11} /> text
               </button>
             </span>

@@ -16,17 +16,33 @@ import { useTweaks } from '../tweaks/tweaks-context'
 import { Icon } from '../icons/Icon'
 import { Link } from '../router/router'
 import { modKey } from '../app/platform'
+import { usePalette } from '../palette/palette-context'
 
 export interface HeaderProps {
   /** Active context label rendered after the home-tag separator. */
   context?: string
+  /** Toggle the off-canvas Sidebar drawer (mobile only). */
+  onToggleNav?: () => void
+  /** Whether the drawer is currently open — drives the toggle's a11y state. */
+  navOpen?: boolean
 }
 
-export function Header({ context = 'home' }: HeaderProps) {
+export function Header({ context = 'home', onToggleNav, navOpen = false }: HeaderProps) {
   const { tweaks } = useTweaks()
+  const palette = usePalette()
 
   return (
     <header class="header">
+      <button
+        class="h-menu"
+        type="button"
+        onClick={onToggleNav}
+        aria-label={navOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={navOpen}
+      >
+        <Icon name={navOpen ? 'X' : 'Menu'} size={18} />
+      </button>
+
       <span class="crumb">
         <Link class="home-tag" href="/">
           blutils
@@ -50,9 +66,14 @@ export function Header({ context = 'home' }: HeaderProps) {
         </>
       )}
 
-      <button class="h-btn" type="button">
+      <button
+        class="h-btn"
+        type="button"
+        onClick={palette.open}
+        aria-label="Open command palette"
+      >
         <Icon name="Search" size={12} />
-        commands
+        <span class="h-btn-label">commands</span>
         <span class="kbd">{modKey}K</span>
       </button>
     </header>

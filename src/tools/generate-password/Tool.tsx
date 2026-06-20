@@ -15,6 +15,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   buildClasses,
@@ -182,8 +183,7 @@ export default function Tool() {
 
   const copy = () => {
     if (!secret) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(secret).catch(() => {})
+    if (copyText(secret)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 900)
     }

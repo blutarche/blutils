@@ -10,8 +10,10 @@
  * segments are still placeholders pending Phases 8 and 9.
  */
 
+import { useEffect, useState } from 'preact/hooks'
 import { Icon } from '../icons/Icon'
 import { modKey } from '../app/platform'
+import { COPY_EVENT, formatBytes, type CopyEventDetail } from '../clipboard/copy'
 
 export interface StatusBarProps {
   contextLabel?: string
@@ -30,9 +32,34 @@ export function StatusBar({
   tabsEnabled = false,
   onToggleTabs,
 }: StatusBarProps) {
+  // Transient "copied · N B" proof — every copyText() write fires
+  // COPY_EVENT; we flash it in place of the context label for ~1.6s.
+  const [copied, setCopied] = useState<string | null>(null)
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>
+    const onCopy = (e: Event) => {
+      const size = (e as CustomEvent<CopyEventDetail>).detail?.size ?? 0
+      setCopied(`copied · ${formatBytes(size)}`)
+      clearTimeout(timer)
+      timer = setTimeout(() => setCopied(null), 1600)
+    }
+    window.addEventListener(COPY_EVENT, onCopy)
+    return () => {
+      window.removeEventListener(COPY_EVENT, onCopy)
+      clearTimeout(timer)
+    }
+  }, [])
+
   return (
     <footer class="status" aria-label="Status bar">
-      <span class="seg seg-tool">{contextLabel}</span>
+      {copied ? (
+        <span class="seg seg-copied">
+          <Icon name="Check" size={12} />
+          {copied}
+        </span>
+      ) : (
+        <span class="seg seg-tool">{contextLabel}</span>
+      )}
 
       <span class="spacer" />
 
@@ -44,7 +71,7 @@ export function StatusBar({
         aria-label="Open chain mode"
       >
         <Icon name="GitMerge" size={12} />
-        chain
+        <span class="seg-label">chain</span>
       </span>
 
       <span
@@ -56,7 +83,7 @@ export function StatusBar({
         aria-pressed={tabsEnabled}
       >
         <Icon name="Plus" size={12} />
-        {tabsEnabled ? 'tabs' : 'single'}
+        <span class="seg-label">{tabsEnabled ? 'tabs' : 'single'}</span>
       </span>
 
       <span
@@ -67,7 +94,7 @@ export function StatusBar({
         aria-label="Open tweaks"
       >
         <Icon name="Settings" size={12} />
-        tweaks
+        <span class="seg-label">tweaks</span>
       </span>
 
       <span
@@ -78,7 +105,7 @@ export function StatusBar({
         aria-label="Open command palette"
       >
         <kbd>{modKey}K</kbd>
-        palette
+        <span class="seg-label">palette</span>
       </span>
     </footer>
   )

@@ -14,6 +14,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   buildAlphabet,
@@ -91,8 +92,7 @@ export default function Tool() {
   }, [alphabet, opts.count, opts.length, seed, valid])
 
   const copy = (text: string, idx: number) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
+    if (copyText(text)) {
       setCopied(idx)
       setTimeout(() => setCopied((c) => (c === idx ? null : c)), 900)
     }

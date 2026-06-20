@@ -360,6 +360,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  text-align: left;
   margin-bottom: 32px;
   padding: 14px 18px;
   border: 1px solid var(--line);
@@ -367,6 +369,12 @@
   border-radius: var(--r-2);
   cursor: pointer;
   transition: border-color 120ms, background 120ms;
+}
+
+.home-cta:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-bd);
 }
 
 .home-cta:hover {
@@ -383,5 +391,156 @@
 
 .home-cta .hint .kbd {
   margin: 0 2px;
+}
+
+/* ─── Home catalog ────────────────────────────────────────────
+ * Below the hero: the full Tool catalog as a grid of cards,
+ * grouped by Category, with an optional "recent" row on top.
+ * This is the primary discovery surface (and the main nav on
+ * mobile, where the Sidebar is tucked behind the menu). */
+
+.home {
+  max-width: 1100px;
+}
+
+.home-hero {
+  /* The hero opened the page; the catalog continues it. A single
+   * rule of separation keeps the two reading as one document. */
+  margin-bottom: 26px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* The CTA sits inside the hero now, so trim its standalone gap. */
+.home-hero .home-cta {
+  margin-bottom: 0;
+}
+
+.home-section {
+  margin-bottom: 28px;
+}
+
+.home-section-h {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+.home-section-h .count {
+  color: var(--muted-2);
+  letter-spacing: 0.08em;
+}
+
+.home-section-h svg {
+  color: var(--muted-2);
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 10px;
+}
+
+.tool-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-2);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 120ms, background 120ms, transform 120ms;
+}
+
+.tool-card:hover {
+  border-color: var(--accent-bd);
+  background: var(--surface-2);
+}
+
+/* Visible keyboard focus — the cards are the primary tab targets on
+ * the Home screen. */
+.tool-card:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-bd);
+}
+
+.tool-card-ic {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--bg-3);
+  color: var(--muted);
+  transition: color 120ms, border-color 120ms;
+}
+
+.tool-card:hover .tool-card-ic {
+  color: var(--accent);
+  border-color: var(--accent-bd);
+}
+
+.tool-card-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tool-card-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.tool-card-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-hi);
+  border: 1px solid var(--accent-bd);
+  background: var(--accent-soft);
+  border-radius: var(--r-1);
+  padding: 0 4px;
+  line-height: 1.5;
+}
+
+.tool-card-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  /* Two-line clamp so cards in a row stay the same height. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home-foot {
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted-2);
+  letter-spacing: 0.02em;
 }
 

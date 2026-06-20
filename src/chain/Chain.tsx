@@ -14,6 +14,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ComponentChildren } from 'preact'
 import { Icon } from '../icons/Icon'
+import { copyText } from '../clipboard/copy'
 import type { IconName } from '../icons/icon-set'
 import { readSlice, writeSlice } from '../storage/local'
 import { readSession, writeSession } from '../storage/session'
@@ -179,7 +180,7 @@ export function Chain() {
   }
 
   const copyValue = (value: string, id: string) => {
-    navigator.clipboard?.writeText(value).catch(() => {})
+    copyText(value)
     setCopiedId(id)
     setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 1500)
   }

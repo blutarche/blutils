@@ -16,6 +16,7 @@
 import { useMemo } from 'preact/hooks'
 import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { parseCidr } from './engine'
 
@@ -37,9 +38,7 @@ export default function Tool({ initialState }: ToolProps) {
   }, [input])
 
   const copy = (s: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(s).catch(() => {})
-    }
+    copyText(s)
   }
 
   const rows: Array<{ label: string; value: string }> = parsed.ok

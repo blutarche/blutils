@@ -17,6 +17,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { parseColor, toHex, toHslString, toRgbString } from './engine'
 
@@ -46,8 +47,7 @@ export default function Tool({ initialState }: ToolProps) {
   }, [input, isEmpty])
 
   const copy = (text: string, key: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
+    if (copyText(text)) {
       setCopied(key)
       setTimeout(() => setCopied((c) => (c === key ? null : c)), 900)
     }

@@ -13,6 +13,7 @@
 
 import { useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   dedupe,
@@ -52,8 +53,7 @@ export default function Tool() {
   const apply = (fn: (s: string) => string) => setResult((r) => fn(r))
 
   const copy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(result).catch(() => {})
+    if (copyText(result)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 900)
     }

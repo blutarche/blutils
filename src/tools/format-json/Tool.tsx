@@ -25,6 +25,7 @@
 import { useMemo } from 'preact/hooks'
 import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { useSeededState } from './use-seeded-state'
 import { highlightJson } from '../../syntax/highlight'
@@ -70,9 +71,7 @@ export default function Tool({ initialState }: ToolProps) {
 
   const copyOutput = () => {
     if (!parsed.ok) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(output).catch(() => {})
-    }
+    copyText(output)
   }
 
   return (

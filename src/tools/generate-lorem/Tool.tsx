@@ -12,6 +12,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 
 const WORDS = `lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum`.split(
   ' ',
@@ -56,9 +57,7 @@ export default function Tool() {
   )
 
   const copy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(out).catch(() => {})
-    }
+    copyText(out)
   }
 
   return (

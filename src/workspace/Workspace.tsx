@@ -13,13 +13,24 @@ import type { ComponentChildren } from 'preact'
 export function Workspace({
   children,
   flush = false,
+  routeKey,
 }: {
   children: ComponentChildren
   flush?: boolean
+  /** Changes per route so the content reveal animation re-runs. */
+  routeKey?: string
 }) {
   return (
-    <section class="main" aria-label="Workspace">
-      {flush ? children : <div class="main-inner">{children}</div>}
+    <section class="main" id="main" tabIndex={-1} aria-label="Workspace">
+      {flush ? (
+        children
+      ) : (
+        <div class="main-inner">
+          <div class="route-reveal" key={routeKey}>
+            {children}
+          </div>
+        </div>
+      )}
     </section>
   )
 }

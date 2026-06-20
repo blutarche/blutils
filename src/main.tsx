@@ -11,6 +11,9 @@ import './styles/syntax.css'
 import './styles/tabs.css'
 import './styles/chain.css'
 import './styles/tweaks.css'
+import './styles/help.css'
+import './styles/craft.css'
+import './styles/responsive.css'
 import { App } from './app/App'
 
 // Production: prerender.mjs inlines the rendered App tree into

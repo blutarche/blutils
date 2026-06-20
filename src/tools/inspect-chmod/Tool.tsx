@@ -14,6 +14,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   type PermClass,
@@ -95,8 +96,7 @@ export default function Tool() {
   }
 
   const copy = (text: string, id: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
+    if (copyText(text)) {
       setCopied(id)
       setTimeout(() => setCopied((c) => (c === id ? null : c)), 900)
     }

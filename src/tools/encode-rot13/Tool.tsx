@@ -15,6 +15,7 @@
 
 import { useMemo } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { useSeededState } from '../format-json/use-seeded-state'
 import { caesar } from './engine'
@@ -36,9 +37,7 @@ export default function Tool() {
   const decodeShift = (26 - shift) % 26
 
   const copy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(output).catch(() => {})
-    }
+    copyText(output)
   }
 
   return (

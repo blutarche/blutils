@@ -19,6 +19,7 @@
 
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -46,9 +47,7 @@ export default function Tool() {
   const nowDate = useMemo(() => new Date(now * 1000), [now])
 
   const copy = (s: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(s).catch(() => {})
-    }
+    copyText(s)
   }
 
   return (

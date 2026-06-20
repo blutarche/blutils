@@ -28,6 +28,8 @@ import { TabsProvider, useTabs } from '../tabs/tabs-context'
 import { TabsBar } from '../tabs/TabsBar'
 import { Chain } from '../chain/Chain'
 import { PinsProvider, usePins } from '../pins/pins-context'
+import { CopyAnnouncer } from '../clipboard/CopyAnnouncer'
+import { ShortcutHelp } from '../help/ShortcutHelp'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -54,6 +56,8 @@ function Shell() {
   const { pathname, navigate } = useRouter()
   const match = useMemo(() => matchRoute(pathname), [pathname])
   const [tweaksOpen, setTweaksOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const palette = usePalette()
   const tabs = useTabs()
   const pins = usePins()
@@ -63,6 +67,52 @@ function Shell() {
       document.title = titleFor(match)
     }
   }, [match])
+
+  // Close the mobile nav drawer whenever the route changes (the user
+  // tapped a tool) and reset the content scroll so each tool opens at
+  // the top rather than mid-page.
+  useEffect(() => {
+    setNavOpen(false)
+    document.querySelector('.main-inner')?.scrollTo({ top: 0 })
+  }, [pathname])
+
+  useEffect(() => {
+    if (!navOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setNavOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navOpen])
+
+  // If the viewport grows past the drawer breakpoint while the drawer
+  // is open, close it so the desktop rail isn't left in an open state.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 761px)')
+    const onChange = () => {
+      if (mq.matches) setNavOpen(false)
+    }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  // `?` toggles the keyboard shortcut sheet — but not while typing in
+  // a field (where `?` is a literal character).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== '?' || e.metaKey || e.ctrlKey || e.altKey) return
+      const t = e.target
+      if (t instanceof HTMLElement) {
+        if (t.isContentEditable) return
+        const tag = t.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      }
+      e.preventDefault()
+      setHelpOpen((v) => !v)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   useEffect(() => {
     if (match.type === 'tool') pins.recordVisit(match.manifest.id)
@@ -74,13 +124,36 @@ function Shell() {
   const activeToolId = match.type === 'tool' ? match.manifest.id : undefined
 
   return (
-    <div class={`app ${tabs.enabled ? 'with-tabs' : ''}`}>
-      <Sidebar activeToolId={activeToolId} />
-      <Header context={contextLabelFor(match)} />
+    <div
+      class={`app ${tabs.enabled ? 'with-tabs' : ''} ${navOpen ? 'nav-open' : ''}`}
+    >
+      <a class="skip-link" href="#main">
+        skip to content
+      </a>
+      <Sidebar
+        activeToolId={activeToolId}
+        onCloseNav={() => setNavOpen(false)}
+        trapFocus={navOpen}
+      />
+      <Header
+        context={contextLabelFor(match)}
+        onToggleNav={() => setNavOpen((v) => !v)}
+        navOpen={navOpen}
+      />
       {tabs.enabled && <TabsBar />}
-      <Workspace flush={match.type === 'chain'}>
+      <Workspace
+        flush={match.type === 'chain'}
+        routeKey={match.type === 'tool' ? match.manifest.id : match.type}
+      >
         <RouteView match={match} />
       </Workspace>
+      {navOpen && (
+        <div
+          class="nav-scrim"
+          onClick={() => setNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <StatusBar
         contextLabel={statusLabelFor(match)}
         onOpenChain={() => navigate('/chain')}
@@ -90,6 +163,8 @@ function Shell() {
         onToggleTabs={() => tabs.setEnabled(!tabs.enabled)}
       />
       <TweaksPanel open={tweaksOpen} onClose={() => setTweaksOpen(false)} />
+      <ShortcutHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <CopyAnnouncer />
     </div>
   )
 }

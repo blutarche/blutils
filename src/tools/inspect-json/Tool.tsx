@@ -19,6 +19,7 @@
 import { useMemo, useState } from 'preact/hooks'
 import type { ToolProps } from '../../types'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { buildNodes, parseJson, type JsonValueType } from './engine'
 
@@ -71,9 +72,7 @@ export default function Tool({ initialState }: ToolProps) {
     setCollapsed(new Set(nodes.filter((n) => n.collapsible).map((n) => n.path)))
 
   const copyPath = (path: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(path).catch(() => {})
-    }
+    copyText(path)
     setCopied(path)
     window.setTimeout(() => setCopied((c) => (c === path ? null : c)), 1000)
   }

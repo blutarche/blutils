@@ -13,6 +13,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { slugify, type Separator } from './engine'
 
@@ -30,9 +31,7 @@ export default function Tool() {
   )
 
   const copy = () => {
-    if (!output) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(output).catch(() => {})
+    if (copyText(output)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 900)
     }

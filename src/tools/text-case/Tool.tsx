@@ -11,6 +11,7 @@
 
 import { useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { CASES } from './engine'
 
@@ -28,8 +29,7 @@ export default function Tool() {
   )
 
   const copy = (text: string, key: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
+    if (copyText(text)) {
       setCopied(key)
       setTimeout(() => setCopied((c) => (c === key ? null : c)), 900)
     }
@@ -78,7 +78,7 @@ export default function Tool() {
                 class="hash-row"
                 style={{ display: 'flex', alignItems: 'center', gap: 10 }}
               >
-                <span style={{ color: 'var(--muted)', minWidth: 130 }}>{r.label}</span>
+                <span class="tc-label">{r.label}</span>
                 <code style={{ flex: 1, wordBreak: 'break-all' }}>{r.value}</code>
                 <button
                   class="btn ghost sm"

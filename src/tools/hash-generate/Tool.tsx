@@ -16,6 +16,7 @@
 
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import { md5 } from './md5'
 
@@ -61,10 +62,7 @@ export default function Tool() {
   const inputBytes = useMemo(() => byteLength(input), [input])
 
   const copy = (value: string) => {
-    if (!value) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(value).catch(() => {})
-    }
+    copyText(value)
   }
 
   const rows: Array<[string, keyof Digests, boolean]> = [

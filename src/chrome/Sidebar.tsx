@@ -23,6 +23,7 @@ import { Link } from '../router/router'
 import { BrandMark } from './BrandMark'
 import { GithubMark } from './GithubMark'
 import { usePins } from '../pins/pins-context'
+import { useFocusTrap } from '../app/use-focus-trap'
 import { useEffect, useState } from 'preact/hooks'
 import {
   DndContext,
@@ -43,9 +44,16 @@ import { CSS } from '@dnd-kit/utilities'
 
 export interface SidebarProps {
   activeToolId?: string
+  /** Close the mobile drawer. Rendered as an in-drawer button that
+   * only appears at the drawer breakpoint (see responsive.css). */
+  onCloseNav?: () => void
+  /** When true (mobile drawer open), trap focus inside the drawer so
+   * keyboard users can't tab into the obscured shell behind it. */
+  trapFocus?: boolean
 }
 
-export function Sidebar({ activeToolId }: SidebarProps) {
+export function Sidebar({ activeToolId, onCloseNav, trapFocus = false }: SidebarProps) {
+  const trapRef = useFocusTrap<HTMLElement>(trapFocus)
   const [q, setQ] = useState('')
   const [isClient, setIsClient] = useState(false)
   const sections = toolsByCategory()
@@ -90,13 +98,22 @@ export function Sidebar({ activeToolId }: SidebarProps) {
     .filter((s) => s.tools.length > 0)
 
   return (
-    <aside class="side" aria-label="Tool catalog">
+    <aside ref={trapRef} tabIndex={-1} class="side" aria-label="Tool catalog">
       <Link class="side-brand" href="/" aria-label="Go home">
         <BrandMark />
         <span class="name">
           <span class="bracket">bl</span>utils<span class="bracket">.</span>
         </span>
       </Link>
+
+      <button
+        type="button"
+        class="side-close"
+        onClick={onCloseNav}
+        aria-label="Close menu"
+      >
+        <Icon name="X" size={16} />
+      </button>
 
       <div class="side-search">
         <span class="ico">

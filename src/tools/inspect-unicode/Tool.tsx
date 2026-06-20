@@ -16,6 +16,7 @@
 
 import { useMemo } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   codePointCount,
@@ -26,9 +27,6 @@ import {
 
 const SAMPLE = 'Hi 👋 café'
 
-/** Column template shared by the header and every body row. */
-const ROW_COLS = '48px 88px 88px 1fr 1fr'
-
 export default function Tool() {
   const [input, setInput] = useToolInput('inspect.unicode', '')
 
@@ -38,9 +36,7 @@ export default function Tool() {
   const units = useMemo(() => codeUnitCount(input), [input])
 
   const copy = (text: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text).catch(() => {})
-    }
+    copyText(text)
   }
 
   return (
@@ -101,30 +97,32 @@ export default function Tool() {
             </span>
           </div>
           <div class="panel-b">
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: ROW_COLS,
-                gap: '8px 12px',
-                alignItems: 'center',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: 'var(--muted)',
-                paddingBottom: 8,
-                borderBottom: '1px solid var(--line)',
-              }}
-            >
-              <span>char</span>
-              <span>U+</span>
-              <span>decimal</span>
-              <span>JS escape</span>
-              <span>UTF-8</span>
+            <div class="uni-scroll">
+              <div
+                class="uni-grid"
+                style={{
+                  display: 'grid',
+                  gap: '8px 12px',
+                  alignItems: 'center',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--muted)',
+                  paddingBottom: 8,
+                  borderBottom: '1px solid var(--line)',
+                }}
+              >
+                <span>char</span>
+                <span>U+</span>
+                <span>decimal</span>
+                <span>JS escape</span>
+                <span>UTF-8</span>
+              </div>
+              {rows.map((row, i) => (
+                <CodePointRow key={i} row={row} onCopy={copy} />
+              ))}
             </div>
-            {rows.map((row, i) => (
-              <CodePointRow key={i} row={row} onCopy={copy} />
-            ))}
           </div>
         </div>
       )}
@@ -141,9 +139,9 @@ function CodePointRow({
 }) {
   return (
     <div
+      class="uni-grid"
       style={{
         display: 'grid',
-        gridTemplateColumns: ROW_COLS,
         gap: '8px 12px',
         alignItems: 'center',
         fontFamily: 'var(--font-mono)',

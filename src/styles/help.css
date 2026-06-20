@@ -1,0 +1,117 @@
+/* Keyboard shortcut overlay (opened with `?`). Mirrors the command
+ * palette's modal framing so the two keyboard surfaces feel related. */
+
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.6);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: pal-bd 120ms ease-out;
+}
+
+[data-theme='light'] .help-backdrop {
+  background: rgba(15, 15, 20, 0.32);
+}
+
+.help {
+  width: 460px;
+  max-width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  animation: pal-in 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.help-close {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--muted-2);
+  border-radius: var(--r-1);
+  transition: color 100ms, background 100ms;
+}
+
+.help-close:hover {
+  color: var(--ink);
+  background: var(--bg-3);
+}
+
+.help-body {
+  padding: 8px 16px 16px;
+  overflow-y: auto;
+}
+
+.help-group {
+  margin-top: 14px;
+}
+
+.help-group-h {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  padding: 4px 0 8px;
+}
+
+.help-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.help-group-h + .help-row {
+  border-top: 0;
+}
+
+.help-label {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.help-keys {
+  display: inline-flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.help-keys kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  padding: 2px 7px;
+  min-width: 22px;
+  text-align: center;
+}

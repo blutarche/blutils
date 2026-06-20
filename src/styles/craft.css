@@ -1,0 +1,141 @@
+/**
+ * Craft layer — cross-cutting interaction polish.
+ *
+ * One place for the details that should feel identical everywhere:
+ * a single keyboard focus ring, a consistent press response, the
+ * skip link, route-reveal motion, and a reduced-motion contract.
+ * Loaded after the per-surface CSS so these win, and before
+ * responsive.css so the breakpoint layer still has the last word.
+ */
+
+/* ─── Skip to content ─────────────────────────────────────────
+ * First tab stop; slides into view only when focused. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  transform: translateY(-150%);
+  padding: 8px 14px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  border-radius: var(--r-1);
+  box-shadow: var(--shadow-2);
+  transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.skip-link:focus {
+  transform: none;
+  outline: none;
+}
+
+/* ─── Unified keyboard focus ring ─────────────────────────────
+ * One accent ring on every interactive element, shown only for
+ * keyboard/AT focus (`:focus-visible`), never on mouse press. The
+ * components deliberately strip the default outline; this restores a
+ * consistent, on-brand one. */
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Framed text fields read better with the ring hugging the frame. */
+.area:focus-visible,
+.input:focus-visible,
+.side-search input:focus-visible,
+.palette-input-row input:focus-visible {
+  outline-offset: -1px;
+}
+
+/* The drawer scrim is purely decorative — never a focus target. */
+.nav-scrim:focus-visible {
+  outline: none;
+}
+
+/* The Workspace is a skip-link target (tabIndex -1); it takes focus
+ * programmatically but shouldn't paint a ring for it. */
+.main:focus {
+  outline: none;
+}
+
+/* ─── Press feedback ──────────────────────────────────────────
+ * A 1px sink on press gives every control a physical "click". */
+.btn:active,
+.h-btn:active,
+.h-menu:active,
+.side-close:active,
+.seg-ctrl button:active,
+.tweaks-radio-group button:active,
+.pal-item:active,
+.status .seg:active,
+.tab-new:active {
+  transform: translateY(1px);
+}
+
+/* The pin button is absolutely centered with translateY(-50%); fold
+ * the press dip into that transform so it doesn't jump on click. */
+.side-pin-btn:active {
+  transform: translateY(calc(-50% + 1px));
+}
+
+/* Larger surfaces dip with a subtle scale instead of a shift. */
+.tool-card:active,
+.home-cta:active {
+  transform: scale(0.992);
+}
+
+.home-cta:active {
+  background: var(--bg-3);
+}
+
+/* ─── Route reveal ────────────────────────────────────────────
+ * Workspace content fades up a few px on navigation so tool
+ * switches read as a transition, not a hard cut. Keyed per route
+ * in the shell. */
+.route-reveal {
+  animation: route-reveal 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes route-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────
+ * Honor the preference globally: neutralize transitions and the
+ * decorative entrance animations. The Tool skeleton's progress
+ * pulse is intentionally preserved (it signals "working") and is
+ * handled in tools.css, so we do NOT blanket-kill animations here. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .route-reveal,
+  .nav-scrim,
+  .seg-copied,
+  .palette,
+  .palette-backdrop,
+  .help,
+  .help-backdrop,
+  .skip-link {
+    animation: none !important;
+  }
+}

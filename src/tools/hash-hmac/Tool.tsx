@@ -17,6 +17,7 @@
 
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Icon } from '../../icons/Icon'
+import { copyText } from '../../clipboard/copy'
 import { useToolInput } from '../../storage/use-tool-input'
 import {
   hmac,
@@ -92,8 +93,7 @@ export default function Tool() {
 
   const copy = () => {
     if (!result) return
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(result).catch(() => {})
+    if (copyText(result)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 900)
     }
