@@ -158,6 +158,7 @@
 
 .pal-item .ic {
   width: 18px;
+  flex-shrink: 0;
   color: var(--muted);
   display: grid;
   place-items: center;
@@ -171,6 +172,11 @@
   font-size: 13px;
   color: var(--ink);
   font-family: var(--font-mono);
+  /* Keep the command name on one line; truncate rather than wrap. */
+  flex: 0 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pal-item .name mark {
@@ -180,6 +186,8 @@
 }
 
 .pal-item .desc {
+  flex: 1 1 auto;
+  min-width: 0;
   color: var(--muted);
   font-size: 12px;
   margin-left: 6px;

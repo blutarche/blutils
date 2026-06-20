@@ -331,44 +331,114 @@
 /* ─── Home screen ─────────────────────────────────────────── */
 
 .home-wordmark {
-  margin: 8px 0 14px;
+  margin: 0 0 16px;
   font-family: var(--font-disp);
   font-weight: 900;
-  font-size: 56px;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-size: clamp(56px, 8.5vw, 104px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
   color: var(--ink);
 }
 
-/* Brand brackets: `bl` and `.` frame the meaningful word `utils`.
- * Uses --accent-deep so the brackets read as framing rather than
- * decoration — the lighter --accent on hover at the sidebar
- * brand keeps that link feeling interactive. */
+/* Brand framing: `bl` and `.` contain the word `utils` — the
+ * containment motif. The framing marks carry the accent + a soft
+ * glow so the wordmark reads as charged, not flat. */
 .home-wordmark .bracket {
-  color: var(--accent-deep);
+  color: var(--accent);
+  text-shadow: 0 0 32px rgba(144, 132, 235, 0.5);
+}
+
+/* The contained word gets a top-down sheen so the display type has
+ * depth rather than a flat fill. Solid ink is the floor; the
+ * transparent text-clip only applies where supported, so the word can
+ * never render invisibly. */
+.home-wordmark .word {
+  color: var(--ink);
+}
+
+@supports (
+  (-webkit-background-clip: text) or (background-clip: text)
+) {
+  .home-wordmark .word {
+    background: linear-gradient(180deg, var(--ink) 30%, var(--ink-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+@media (forced-colors: active) {
+  .home-wordmark .word {
+    -webkit-text-fill-color: CanvasText;
+    color: CanvasText;
+  }
+}
+
+[data-theme='light'] .home-wordmark .bracket {
+  text-shadow: none;
 }
 
 .home-sub {
-  margin: 0 0 30px;
-  max-width: 60ch;
-  font-size: 14.5px;
+  margin: 0 0 18px;
+  max-width: 52ch;
+  font-size: 15px;
   line-height: 1.6;
   color: var(--muted);
 }
 
+/* System-status strip — the privacy thesis as an operational readout
+ * rather than a slogan. */
+.home-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted-2);
+}
+
+.home-status .hs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.home-status .hs-live {
+  color: var(--accent-hi);
+}
+
+.home-status .hs-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 9px var(--accent);
+}
+
+.home-status .hs-sep {
+  color: var(--muted-3);
+}
+
+/* Command slab — the primary entry, framed like an instrument module. */
 .home-cta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
   width: 100%;
+  max-width: 640px;
   text-align: left;
-  margin-bottom: 32px;
-  padding: 14px 18px;
+  margin-bottom: 0;
+  padding: 14px 16px;
   border: 1px solid var(--line);
   background: var(--surface-2);
   border-radius: var(--r-2);
   cursor: pointer;
-  transition: border-color 120ms, background 120ms;
+  transition: border-color 140ms, background 140ms, box-shadow 140ms;
 }
 
 .home-cta:focus-visible {
@@ -380,6 +450,19 @@
 .home-cta:hover {
   border-color: var(--accent-bd);
   background: var(--surface);
+  box-shadow: 0 0 0 1px var(--accent-bd), 0 0 32px rgba(144, 132, 235, 0.1);
+}
+
+.home-cta-glyph {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-1);
+  background: var(--bg-3);
+  color: var(--accent);
 }
 
 .home-cta .hint {
@@ -404,16 +487,61 @@
 }
 
 .home-hero {
-  /* The hero opened the page; the catalog continues it. A single
-   * rule of separation keeps the two reading as one document. */
-  margin-bottom: 26px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line);
+  position: relative;
+  margin-bottom: 34px;
+  padding: 20px 22px 30px;
 }
 
-/* The CTA sits inside the hero now, so trim its standalone gap. */
-.home-hero .home-cta {
-  margin-bottom: 0;
+/* Containment crop-marks — top-left and bottom-right L-brackets mark
+ * the "local boundary": the data stays inside the frame. The single
+ * most on-brand way to make the privacy thesis visible at a glance. */
+.home-hero::before,
+.home-hero::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent-bd);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.home-hero::before {
+  top: 0;
+  left: 0;
+  border-width: 1px 0 0 1px;
+}
+
+.home-hero::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1px 1px 0;
+}
+
+/* One orchestrated reveal: hero rows rise in sequence on load. */
+.home-hero > * {
+  animation: hero-rise 460ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.home-hero > *:nth-child(1) { animation-delay: 40ms; }
+.home-hero > *:nth-child(2) { animation-delay: 90ms; }
+.home-hero > *:nth-child(3) { animation-delay: 140ms; }
+.home-hero > *:nth-child(4) { animation-delay: 190ms; }
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero > * {
+    animation: none;
+  }
 }
 
 .home-section {
@@ -448,10 +576,19 @@
   gap: 10px;
 }
 
+/* Two-row grid: the icon shares the title's row only, so it sits
+ * optically centered against the title while the description hangs
+ * below in the second row — not centered against the whole card. */
 .tool-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 11px;
+  /* align-items centers the icon against the title within row 1;
+   * align-content: start keeps content pinned to the top so titles line
+   * up across cards of differing height (grid's default stretch would
+   * otherwise float each title to its card's middle). */
+  align-items: center;
+  align-content: start;
   padding: 13px 14px;
   border: 1px solid var(--line);
   background: var(--surface);
@@ -475,31 +612,24 @@
 }
 
 .tool-card-ic {
+  grid-column: 1;
+  grid-row: 1;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--r-1);
-  background: var(--bg-3);
+  width: 22px;
+  height: 22px;
   color: var(--muted);
-  transition: color 120ms, border-color 120ms;
+  transition: color 120ms;
 }
 
 .tool-card:hover .tool-card-ic {
   color: var(--accent);
-  border-color: var(--accent-bd);
-}
-
-.tool-card-body {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
 }
 
 .tool-card-name {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -523,6 +653,10 @@
 }
 
 .tool-card-desc {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  margin-top: 2px;
   font-size: 12px;
   line-height: 1.45;
   color: var(--muted);

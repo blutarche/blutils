@@ -101,7 +101,12 @@ export default function Tool() {
       </div>
 
       {isEmpty ? (
-        <div class="tool-empty">Enter a foreground and background color to see the WCAG contrast ratio.</div>
+        <div class="panel">
+          <div class="tool-empty">
+            Enter a foreground and background color to see the WCAG contrast
+            ratio.
+          </div>
+        </div>
       ) : (
         <>
           <div class="panel" style={{ marginBottom: 14 }}>

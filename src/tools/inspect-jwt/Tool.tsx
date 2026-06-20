@@ -108,7 +108,13 @@ export default function Tool({ initialState }: ToolProps) {
       </div>
 
       {isEmpty ? (
-        <div class="tool-empty">Decoded header, payload, and claims appear here.</div>
+        <div class="panel">
+          <div class="panel-b">
+            <div class="tool-empty">
+              Decoded header, payload, and claims appear here.
+            </div>
+          </div>
+        </div>
       ) : !parsed.ok ? (
         <div class="panel">
           <div class="panel-b">

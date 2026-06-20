@@ -13,6 +13,7 @@ import './styles/chain.css'
 import './styles/tweaks.css'
 import './styles/help.css'
 import './styles/craft.css'
+import './styles/atmosphere.css'
 import './styles/responsive.css'
 import { App } from './app/App'
 

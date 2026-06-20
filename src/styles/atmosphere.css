@@ -1,0 +1,90 @@
+/**
+ * Atmosphere — the "instrument housing" depth layer.
+ *
+ * The workspace was flat black. This adds three quiet layers behind
+ * the working surfaces so the app reads as a machined instrument
+ * rather than an empty page: a faint technical grid (graph-paper /
+ * PCB registration), a soft accent glow anchored top-right, and a
+ * trace of grain to break banding. All sit behind opaque panels, so
+ * tool content stays a clean, legible work surface.
+ *
+ * Boldness lives here and on the Home hero — never on the bench.
+ */
+
+:root {
+  --grid-line: rgba(255, 255, 255, 0.02);
+  --grid-glow: rgba(144, 132, 235, 0.16);
+  --surface-hi: rgba(255, 255, 255, 0.04);
+  --surface-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme='light'] {
+  --grid-line: rgba(15, 15, 20, 0.035);
+  --grid-glow: rgba(91, 79, 204, 0.1);
+  --surface-hi: rgba(255, 255, 255, 0.8);
+  --surface-shadow: 0 14px 32px rgba(15, 15, 20, 0.06);
+}
+
+/* Ambient grid + a defined accent glow bleeding from the top-right,
+ * fixed under the scrolling content. */
+.main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(55% 50% at 100% 0%, var(--grid-glow), transparent 68%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 44px 44px, 44px 44px;
+}
+
+/* Content rides above the ambient layer. */
+.main-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Trace grain over the whole shell to kill flat-black banding. Screen
+ * blend at a whisper of opacity — invisible as "static", present as
+ * texture. */
+/* Opacity-only (no blend mode) keeps it cheap — a fixed full-viewport
+ * mix-blend layer repaints on every scroll/update; plain opacity over
+ * the dark base reads the same without the compositing tax. */
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+[data-theme='light'] .app::after {
+  opacity: 0.025;
+}
+
+/* ─── Machined surfaces ───────────────────────────────────────
+ * A 1px top highlight + soft drop shadow gives panels and cards a
+ * milled edge without resorting to glass or heavy gradients. */
+.panel {
+  box-shadow:
+    inset 0 1px 0 var(--surface-hi),
+    var(--surface-shadow);
+}
+
+.tool-card {
+  box-shadow: inset 0 1px 0 var(--surface-hi);
+}
+
+/* ─── Accent as signal ────────────────────────────────────────
+ * The accent earns a soft glow only where it marks live state. */
+.side-item.on {
+  box-shadow: inset 0 0 0 1px rgba(144, 132, 235, 0.06);
+}
+
+.side-item.on .ic {
+  filter: drop-shadow(0 0 6px rgba(144, 132, 235, 0.5));
+}

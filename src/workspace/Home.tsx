@@ -38,16 +38,31 @@ export function Home() {
     <div class="home">
       <header class="home-hero">
         <h1 class="home-wordmark">
-          <span class="bracket">bl</span>utils<span class="bracket">.</span>
+          <span class="bracket">bl</span>
+          <span class="word">utils</span>
+          <span class="bracket">.</span>
         </h1>
 
         <p class="home-sub">
-          local-only, lightning-fast developer utilities. open-source.
-          everything runs in your browser — nothing leaves it.
+          local-only developer utilities. fast, open-source, and entirely in
+          your browser.
         </p>
 
+        <div class="home-status" aria-label="runtime status">
+          <span class="hs-item hs-live">
+            <span class="hs-dot" />
+            local runtime
+          </span>
+          <span class="hs-sep">/</span>
+          <span class="hs-item">no network</span>
+          <span class="hs-sep">/</span>
+          <span class="hs-item">{tools.length} tools</span>
+        </div>
+
         <button class="home-cta" type="button" onClick={palette.open}>
-          <Icon name="Search" size={14} />
+          <span class="home-cta-glyph">
+            <Icon name="Search" size={15} />
+          </span>
           <span class="hint">
             press <span class="kbd">{modKey}K</span> or <span class="kbd">/</span>{' '}
             to jump to any tool
@@ -105,18 +120,16 @@ function ToolCard({ manifest }: { manifest: ToolManifest }) {
       onTouchStart={warm}
     >
       <span class="tool-card-ic">
-        <Icon name={iconName} size={16} />
+        <Icon name={iconName} size={17} />
       </span>
-      <span class="tool-card-body">
-        <span class="tool-card-name">
-          {manifest.name.toLowerCase()}
-          {manifest.status === 'experimental' && (
-            <span class="tool-card-tag">exp</span>
-          )}
-          {manifest.status === 'beta' && <span class="tool-card-tag">beta</span>}
-        </span>
-        <span class="tool-card-desc">{manifest.description}</span>
+      <span class="tool-card-name">
+        {manifest.name.toLowerCase()}
+        {manifest.status === 'experimental' && (
+          <span class="tool-card-tag">exp</span>
+        )}
+        {manifest.status === 'beta' && <span class="tool-card-tag">beta</span>}
       </span>
+      <span class="tool-card-desc">{manifest.description}</span>
     </Link>
   )
 }

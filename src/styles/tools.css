@@ -158,13 +158,22 @@
 
 /* Neutral "nothing entered yet" state for output panels — distinct
  * from .json-error (which signals a real parse failure). Sits where
- * a result would render before the user types or loads a sample. */
+ * a result would render before the user types or loads a sample.
+ *
+ * Padding matches .area.bare / .panel-b (12px 14px) so the placeholder
+ * occupies the same box as the eventual output — no shift when content
+ * arrives. When nested inside a .panel-b (which already pads), it drops
+ * its own padding so it aligns flush with the output rows. */
 .tool-empty {
-  padding: 20px 14px;
+  padding: 12px 14px;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.6;
+}
+
+.panel-b .tool-empty {
+  padding: 0;
 }
 
 .area.bare {
@@ -228,6 +237,14 @@
 }
 
 .input:focus { border-color: var(--accent-bd); }
+
+/* Range sliders use the secondary accent (cyan) so value controls read
+ * distinctly from the primary purple — and never as the browser's
+ * default blue. */
+input[type='range'] {
+  accent-color: var(--info);
+}
+
 .input.bare {
   border: 0;
   padding: 0;

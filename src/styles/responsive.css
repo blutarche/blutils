@@ -103,7 +103,9 @@
     display: inline-grid;
     place-items: center;
     position: absolute;
-    top: 11px;
+    /* Centered within the brand row (header height), not the full
+     * drawer — .side is the positioned ancestor. */
+    top: calc((var(--header-h) - 30px) / 2);
     right: 12px;
     width: 30px;
     height: 30px;
@@ -175,6 +177,12 @@
     display: none;
   }
 
+  /* Skip the fixed full-viewport grain on phones — paint budget is
+   * tighter and the texture is barely perceptible there anyway. */
+  .app::after {
+    display: none;
+  }
+
   .status .seg-tool {
     max-width: 42vw;
     overflow: hidden;
@@ -211,7 +219,22 @@
 
 @media (max-width: 600px) {
   .home-wordmark {
-    font-size: 40px;
+    font-size: 44px;
+  }
+
+  /* Trim the hero frame inset and let the command slab stack so the
+   * primary button never gets squeezed off-screen. */
+  .home-hero {
+    padding: 12px 12px 22px;
+  }
+
+  .home-cta {
+    flex-wrap: wrap;
+  }
+
+  .home-cta .btn.primary {
+    width: 100%;
+    justify-content: center;
   }
 
   .now-stamp {

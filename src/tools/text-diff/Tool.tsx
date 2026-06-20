@@ -199,7 +199,9 @@ export default function Tool() {
       </div>
 
       {isEmpty ? (
-        <div class="tool-empty">Paste text into both panels to see the diff.</div>
+        <div class="panel">
+          <div class="tool-empty">Paste text into both panels to see the diff.</div>
+        </div>
       ) : !result ? (
         <div class="json-error">
           Diff too large to render — the LCS table cap is {(250_000).toLocaleString()} cells.
