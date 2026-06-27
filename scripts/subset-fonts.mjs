@@ -57,6 +57,24 @@ const FONTS = [
     output: 'JetBrainsMono-Variable.subset.woff2',
   },
   {
+    family: 'inter',
+    source: {
+      url: 'https://github.com/rsms/inter/raw/master/docs/font-files/InterVariable.woff2',
+      file: 'InterVariable.woff2',
+    },
+    license: 'https://github.com/rsms/inter/raw/master/LICENSE.txt',
+    output: 'Inter-Variable.subset.woff2',
+  },
+  {
+    family: 'fjalla-one',
+    source: {
+      url: 'https://github.com/google/fonts/raw/main/ofl/fjallaone/FjallaOne-Regular.ttf',
+      file: 'FjallaOne-Regular.ttf',
+    },
+    license: 'https://github.com/google/fonts/raw/main/ofl/fjallaone/OFL.txt',
+    output: 'FjallaOne-Regular.subset.woff2',
+  },
+  {
     family: 'archivo',
     source: {
       url: 'https://github.com/Omnibus-Type/Archivo/raw/master/fonts/variable/Archivo%5Bwdth%2Cwght%5D.ttf',

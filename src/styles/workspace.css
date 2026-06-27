@@ -350,7 +350,7 @@
  * glow so the wordmark reads as charged, not flat. */
 .home-wordmark .bracket {
   color: var(--accent);
-  text-shadow: 0 0 32px rgba(144, 132, 235, 0.5);
+  text-shadow: 0 0 32px rgba(124, 112, 245, 0.5);
 }
 
 /* The contained word gets a top-down sheen so the display type has
@@ -421,8 +421,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 9px var(--accent);
+  background: var(--accent-2);
+  box-shadow: 0 0 9px var(--accent-2);
 }
 
 .home-status .hs-sep {
@@ -455,7 +455,7 @@
 .home-cta:hover {
   border-color: var(--accent-bd);
   background: var(--surface);
-  box-shadow: 0 0 0 1px var(--accent-bd), 0 0 32px rgba(144, 132, 235, 0.1);
+  box-shadow: 0 0 0 1px var(--accent-bd), 0 0 32px rgba(124, 112, 245, 0.1);
 }
 
 .home-cta-glyph {
@@ -508,7 +508,7 @@
   position: absolute;
   width: 18px;
   height: 18px;
-  border-color: var(--accent-bd);
+  border-color: var(--accent-2-bd);
   border-style: solid;
   pointer-events: none;
 }

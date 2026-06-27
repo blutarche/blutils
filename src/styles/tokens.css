@@ -45,13 +45,20 @@
   --chrome-muted-3:  #38383F;
   --chrome-muted-4:  #2C2C32;
 
-  /* Accent — muted blue-purple */
-  --accent:        #9084EB;
-  --accent-hi:     #A89FF1;
-  --accent-deep:   #5E54A8;
-  --accent-soft:   rgba(144, 132, 235, 0.10);
-  --accent-bd:     rgba(144, 132, 235, 0.30);
-  --accent-glow:   0 0 24px rgba(144, 132, 235, 0.28);
+  /* Accent — blue-purple */
+  --accent:        #7C70F5;
+  --accent-hi:     #9088F8;
+  --accent-deep:   #5A4FC0;
+  --accent-soft:   rgba(124, 112, 245, 0.10);
+  --accent-bd:     rgba(124, 112, 245, 0.30);
+  --accent-glow:   0 0 24px rgba(124, 112, 245, 0.28);
+
+  /* Secondary accent — soft pink, data viz / range sliders */
+  --accent-2:      #F0A8D0;
+  --accent-2-hi:   #F5BFE0;
+  --accent-2-deep: #C87AAA;
+  --accent-2-soft: rgba(240, 168, 208, 0.10);
+  --accent-2-bd:   rgba(240, 168, 208, 0.30);
 
   /* Status colours */
   --ok:        #6FBE83;
@@ -59,7 +66,7 @@
   --info:      #8EE0E8;
   --warn:      #E0B85D;
 
-  --selection: rgba(144, 132, 235, 0.32);
+  --selection: rgba(124, 112, 245, 0.32);
 
   /* Shadows — used sparingly (palette, toast, overlays) */
   --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.4);
@@ -84,9 +91,81 @@
   --content-max: 1440px;
 
   /* Type families */
-  --font:      'Space Grotesk', 'Helvetica Neue', system-ui, sans-serif;
+  --font:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-alt:  'Space Grotesk', 'Helvetica Neue', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-disp: 'Archivo', var(--font);
+
+  /* Type scale */
+  --text-2xs:  0.6875rem;
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-md:   1.125rem;
+  --text-lg:   1.25rem;
+  --text-xl:   1.5rem;
+  --text-2xl:  2rem;
+  --text-3xl:  2.75rem;
+  --text-4xl:  3.75rem;
+  --text-5xl:  5.5rem;
+
+  /* Weights */
+  --w-light:   300;
+  --w-regular: 400;
+  --w-medium:  500;
+  --w-semi:    600;
+  --w-bold:    700;
+  --w-black:   900;
+
+  /* Leading */
+  --leading-tight:   1.05;
+  --leading-snug:    1.2;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* Tracking */
+  --tracking-tight:   -0.03em;
+  --tracking-snug:    -0.015em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.06em;
+  --tracking-wider:    0.12em;
+  --tracking-widest:   0.22em;
+
+  /* Spacing — 4px base grid */
+  --sp-px: 1px;
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+
+  /* Motion */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-instant: 60ms;
+  --t-fast:    120ms;
+  --t-base:    200ms;
+  --t-slow:    300ms;
+
+  /* Layout */
+  --page-px: 24px;
+
+  /* Grain */
+  --grain-opacity: 0.045;
+
+  /* Z-index */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 100;
+  --z-modal:   200;
 }
 
 [data-theme="light"] {
@@ -108,17 +187,26 @@
   --muted-2:   #6C6C74;
   --muted-3:   #9C9CA4;
 
-  --accent:        #5B4FCC;
-  --accent-hi:     #4F44B5;
+  --accent:        #5C51D0;
+  --accent-hi:     #5047B8;
   --accent-deep:   #3F356E;
-  --accent-soft:   rgba(91, 79, 204, 0.08);
-  --accent-bd:     rgba(91, 79, 204, 0.32);
+  --accent-soft:   rgba(92, 81, 208, 0.08);
+  --accent-bd:     rgba(92, 81, 208, 0.32);
   --accent-glow:   none;
+
+  --accent-2:      #C87AAA;
+  --accent-2-hi:   #D48FBA;
+  --accent-2-deep: #A05E88;
+  --accent-2-soft: rgba(200, 122, 170, 0.08);
+  --accent-2-bd:   rgba(200, 122, 170, 0.30);
 
   --shadow-1: 0 1px 0 rgba(15, 15, 20, 0.04);
   --shadow-2: 0 12px 40px rgba(15, 15, 20, 0.12), 0 2px 6px rgba(15, 15, 20, 0.06);
 
-  --selection: rgba(91, 79, 204, 0.20);
+  --selection: rgba(92, 81, 208, 0.20);
+
+  /* Grain */
+  --grain-opacity: 0.025;
 
   /* Chrome flips light too but stays distinct from the workspace */
   --chrome-bg:       #EDEDF0;
