@@ -1,6 +1,6 @@
 [package]
 name = "blutils"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local-only developer utilities"
 authors = ["blutarche"]
 edition = "2021"
