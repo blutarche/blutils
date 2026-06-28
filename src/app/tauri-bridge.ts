@@ -27,6 +27,7 @@ export function initTauriBridge(): () => void {
   })
 
   disposers.push(reportDragRegions())
+  checkForUpdates()
 
   return () => {
     for (const dispose of disposers.splice(0)) dispose()
@@ -42,6 +43,20 @@ export function initTauriBridge(): () => void {
  * Re-reports on resize and whenever the header's contents change. Returns
  * a disposer that removes every observer and listener it set up.
  */
+async function checkForUpdates() {
+  try {
+    const { check } = await import('@tauri-apps/plugin-updater')
+    const update = await check()
+    if (!update) return
+    console.log(`[updater] ${update.version} available, installing…`)
+    await update.downloadAndInstall()
+    const { relaunch } = await import('@tauri-apps/plugin-process')
+    await relaunch()
+  } catch (e) {
+    console.warn('[updater]', e)
+  }
+}
+
 function reportDragRegions(): () => void {
   let raf = 0
 

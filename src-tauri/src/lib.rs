@@ -53,6 +53,8 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .manage(drag.clone())
         .invoke_handler(tauri::generate_handler![set_drag_regions])
         .setup(move |app| {
