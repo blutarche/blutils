@@ -18,6 +18,12 @@ import { Link } from '../router/router'
 import { modKey } from '../app/platform'
 import { usePalette } from '../palette/palette-context'
 
+// Note: on the Tauri desktop shell the header bar is the window's drag
+// handle, but dragging is driven natively (src-tauri/src/macos_drag.rs)
+// rather than by a `data-tauri-drag-region` attribute — WKWebView eats
+// the drag clicks under the inset title bar, so the JS path is unreliable
+// while the window is focused.
+
 export interface HeaderProps {
   /** Active context label rendered after the home-tag separator. */
   context?: string

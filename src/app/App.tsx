@@ -30,6 +30,7 @@ import { Chain } from '../chain/Chain'
 import { PinsProvider, usePins } from '../pins/pins-context'
 import { CopyAnnouncer } from '../clipboard/CopyAnnouncer'
 import { ShortcutHelp } from '../help/ShortcutHelp'
+import { initTauriBridge, setMenuHandler } from './tauri-bridge'
 
 export interface AppProps {
   /** Initial pathname for SSR/prerender. Client ignores this. */
@@ -61,6 +62,18 @@ function Shell() {
   const palette = usePalette()
   const tabs = useTabs()
   const pins = usePins()
+
+  useEffect(() => initTauriBridge(), [])
+  useEffect(() => {
+    setMenuHandler((action) => {
+      switch (action) {
+        case 'palette': palette.open(); break
+        case 'tweaks': setTweaksOpen(true); break
+        case 'chain': navigate('/chain'); break
+        case 'home': navigate('/'); break
+      }
+    })
+  }, [palette, navigate])
 
   useEffect(() => {
     if (typeof document !== 'undefined') {

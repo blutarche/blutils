@@ -13,7 +13,7 @@ import { Icon } from '../icons/Icon'
 import { Link } from '../router/router'
 import { usePalette } from '../palette/palette-context'
 import { usePins } from '../pins/pins-context'
-import { modKey } from '../app/platform'
+import { modKey, isDesktop } from '../app/platform'
 import { tools, toolsByCategory, toolById, prefetchTool } from '../tools/_registry'
 import { isIconName, type IconName } from '../icons/icon-set'
 import type { ToolManifest } from '../types'
@@ -44,8 +44,8 @@ export function Home() {
         </h1>
 
         <p class="home-sub">
-          local-only developer utilities. fast, open-source, and entirely in
-          your browser.
+          local-only developer utilities. fast, open-source, and nothing leaves
+          your {isDesktop ? 'machine' : 'browser'}.
         </p>
 
         <div class="home-status" aria-label="runtime status">

@@ -5,6 +5,11 @@
  * in Phase 12, by the Cloudflare Pages `public/_headers` generator
  * so the meta tag and the HTTP header agree.
  *
+ * The Tauri desktop shell mirrors these directives header-level in
+ * `src-tauri/tauri.conf.json` (`app.security.csp`) for defense-in-depth
+ * on top of the injected meta tag. That copy is static JSON and must be
+ * kept in sync with the directives below by hand.
+ *
  * `connect-src 'none'` is the load-bearing directive: it makes the
  * locality principle (no user data leaves the browser) a browser-
  * enforced rule rather than a developer promise. The runtime

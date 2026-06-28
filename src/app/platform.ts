@@ -14,3 +14,6 @@ const platform =
 export const isMac = /Mac|iPhone|iPad|iPod/.test(platform)
 
 export const modKey = isMac ? '⌘' : 'Ctrl'
+
+export const isDesktop =
+  typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window

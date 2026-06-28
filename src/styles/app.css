@@ -29,3 +29,42 @@
 }
 
 .app.with-tabs .tabs-bar { grid-area: tabs; }
+
+/* ─── Tauri desktop shell ────────────────────────────────── */
+
+/* Traffic lights are inset into the brand row; clear them with room
+   to breathe and match the header's border colour so the brand row
+   and header read as one continuous toolbar. Window dragging is
+   handled by `data-tauri-drag-region` (see Header.tsx / Sidebar.tsx),
+   not CSS — Tauri's WKWebView ignores `-webkit-app-region`. */
+[data-tauri] .side-brand {
+  padding-left: 92px;
+  border-bottom-color: var(--line);
+}
+
+/* One seamless titlebar across the top: drop the sidebar's vertical
+   divider where it would slice through the bar, and start it just
+   below the brand row instead. */
+[data-tauri] .side {
+  background: rgba(7, 7, 10, 0.85);
+  border-right: none;
+  position: relative;
+}
+
+[data-tauri] .side::after {
+  content: '';
+  position: absolute;
+  top: var(--header-h);
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--chrome-border);
+  pointer-events: none;
+}
+
+/* The brand wordmark already says "blutils." — drop the duplicate
+   from the header breadcrumb so it just shows the current context. */
+[data-tauri] .header .crumb .home-tag,
+[data-tauri] .header .crumb .sep {
+  display: none;
+}

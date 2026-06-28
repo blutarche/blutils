@@ -9,6 +9,10 @@ dist-server/
 .tsbuild/
 *.tsbuildinfo
 
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
 # Local environment
 .env
 .env.*
