@@ -6,6 +6,25 @@ Live at **[utils.blutarche.dev](https://utils.blutarche.dev)**
 
 ---
 
+## Desktop app (macOS, Apple Silicon)
+
+The app is ad-hoc signed, not notarized, so a **browser** download triggers macOS Gatekeeper's "Apple could not verify" prompt. Install from the command line instead — `curl`/`tar` don't set the quarantine flag, so it opens with no prompt:
+
+```sh
+curl -L https://github.com/blutarche/blutils/releases/latest/download/blutils_aarch64.app.tar.gz | tar xz -C /Applications
+open /Applications/blutils.app
+```
+
+If you already downloaded the `.dmg` in a browser, drag it to `/Applications`, then clear the flag:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/blutils.app
+```
+
+Updates after first launch are handled in-app and don't re-prompt.
+
+---
+
 ## Install and run
 
 ```sh
