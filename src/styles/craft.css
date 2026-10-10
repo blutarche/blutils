@@ -3,7 +3,7 @@
  *
  * One place for the details that should feel identical everywhere:
  * a single keyboard focus ring, a consistent press response, the
- * skip link, route-reveal motion, and a reduced-motion contract.
+ * skip link, and a reduced-motion contract.
  * Loaded after the per-surface CSS so these win, and before
  * responsive.css so the breakpoint layer still has the last word.
  */
@@ -95,25 +95,6 @@ select:focus-visible {
   background: var(--bg-3);
 }
 
-/* ─── Route reveal ────────────────────────────────────────────
- * Workspace content fades up a few px on navigation so tool
- * switches read as a transition, not a hard cut. Keyed per route
- * in the shell. */
-.route-reveal {
-  animation: route-reveal 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes route-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 /* ─── Reduced motion ──────────────────────────────────────────
  * Honor the preference globally: neutralize transitions and the
  * decorative entrance animations. The Tool skeleton's progress
@@ -127,11 +108,8 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 
-  .route-reveal,
   .nav-scrim,
   .seg-copied,
-  .palette,
-  .palette-backdrop,
   .help,
   .help-backdrop,
   .skip-link {

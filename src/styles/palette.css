@@ -2,9 +2,8 @@
  *
  * Sized like Spotlight / VSCode (600px max, 12vh from top), keeps
  * an internal max-height so long result lists scroll inside the
- * panel rather than the viewport. Animation is 140ms drop-in with
- * a subtle backdrop fade — kept short because the palette is the
- * most frequently opened surface in the app.
+ * panel rather than the viewport. Opens with no animation because
+ * the palette is the most frequently opened surface in the app.
  */
 
 .palette-backdrop {
@@ -17,7 +16,6 @@
   display: flex;
   justify-content: center;
   padding-top: 12vh;
-  animation: pal-bd 120ms ease-out;
 }
 
 [data-theme='light'] .palette-backdrop {
@@ -40,7 +38,6 @@
   border-radius: var(--r-3);
   box-shadow: var(--shadow-2);
   overflow: hidden;
-  animation: pal-in 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes pal-in {

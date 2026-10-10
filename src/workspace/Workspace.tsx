@@ -17,7 +17,7 @@ export function Workspace({
 }: {
   children: ComponentChildren
   flush?: boolean
-  /** Changes per route so the content reveal animation re-runs. */
+  /** Changes per route so the view remounts. */
   routeKey?: string
 }) {
   return (
@@ -26,7 +26,7 @@ export function Workspace({
         children
       ) : (
         <div class="main-inner">
-          <div class="route-reveal" key={routeKey}>
+          <div key={routeKey}>
             {children}
           </div>
         </div>
