@@ -218,13 +218,11 @@ function Shell() {
       >
         <RouteView match={match} />
       </Workspace>
-      {navOpen && (
-        <div
-          class="nav-scrim"
-          onClick={() => setNavOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      <div
+        class="nav-scrim"
+        onClick={() => setNavOpen(false)}
+        aria-hidden="true"
+      />
       <StatusBar
         contextLabel={statusLabelFor(match)}
         onOpenChain={() => navigate('/chain')}

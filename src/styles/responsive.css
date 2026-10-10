@@ -128,7 +128,21 @@
     background: rgba(7, 7, 10, 0.55);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
-    animation: scrim-in 160ms ease-out;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 220ms var(--ease-standard),
+      visibility 0s linear 220ms;
+  }
+
+  .app.nav-open .nav-scrim {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 220ms var(--ease-standard),
+      visibility 0s linear 0s;
   }
 
   /* Header: reveal the menu toggle; the commands button keeps only
@@ -188,15 +202,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-}
-
-@keyframes scrim-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
