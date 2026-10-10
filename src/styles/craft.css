@@ -108,6 +108,7 @@ select:focus-visible {
     scroll-behavior: auto !important;
   }
 
+  .chain-step,
   .seg-copied,
   .help,
   .help-backdrop,

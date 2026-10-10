@@ -65,6 +65,16 @@
 .chain-step.is-output { border-color: rgba(111, 190, 131, 0.4); }
 .chain-step.is-error  { border-color: rgba(226, 111, 92, 0.4); }
 
+/* Plays once on the step just added, never on load or recompute. */
+.chain-step.is-entering {
+  animation: chain-step-in var(--t-base) var(--ease-out);
+}
+
+@keyframes chain-step-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
 .chain-step-h {
   display: flex;
   align-items: center;

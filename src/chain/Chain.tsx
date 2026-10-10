@@ -104,6 +104,7 @@ export function Chain() {
   const [pickerQuery, setPickerQuery] = useState('')
   const [isClient, setIsClient] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [enteringId, setEnteringId] = useState<string | null>(null)
   const runToken = useRef(0)
 
   useEffect(() => { setIsClient(true) }, [])
@@ -155,12 +156,14 @@ export function Chain() {
   }
 
   const addStep = (afterId: string, opId: string) => {
+    const id = genId()
     setChain((prev) => {
       const idx = prev.findIndex((s) => s.id === afterId)
       const next = prev.slice()
-      next.splice(idx + 1, 0, { id: genId(), opId })
+      next.splice(idx + 1, 0, { id, opId })
       return next
     })
+    setEnteringId(id)
     closePicker()
   }
 
@@ -272,7 +275,13 @@ export function Chain() {
 
     return (
       <>
-        <div class={`chain-step ${stateClass}`}>
+        <div
+          class={`chain-step ${stateClass}${step.id === enteringId ? ' is-entering' : ''}`}
+          onAnimationEnd={(e) => {
+            if (e.target === e.currentTarget && step.id === enteringId)
+              setEnteringId(null)
+          }}
+        >
           <div class="chain-step-h">
             {!isInput && dragHandle}
             <span class="num">step {i + 1} /</span>
