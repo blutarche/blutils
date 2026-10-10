@@ -100,7 +100,8 @@ node .claude/skills/run-blutils/driver.mjs [options] <url>
   --text <sel>          print textContent of the first match (repeatable)
   --eval <expr>         evaluate JS in the page, print JSON result (repeatable)
   --wait <sel>          block until selector exists (exit 1 if it never appears)
-  --shot <path>         PNG screenshot after all actions
+  --key <combo>         press a key: "Meta+k", "Escape", "Enter", "?"
+  --shot <path>         PNG screenshot at this point in the sequence (repeatable)
   --size <WxH>          viewport (default 1280x800)
   --settle <ms>         pause after load / between actions (default 700)
   --keep                leave the browser running for manual CDP poking

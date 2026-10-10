@@ -22,8 +22,9 @@
  *   --text <sel>          print textContent of the first match (repeatable)
  *   --eval <expr>         evaluate JS in the page, print JSON result (repeatable)
  *   --wait <sel>          wait until selector exists before continuing (repeatable)
+ *   --key <combo>         press a key: "Meta+k", "Escape", "Enter", "ArrowDown", "?"
  *   --settle <ms>         pause after load / between actions (default 700)
- *   --shot <path>         capture a PNG screenshot after all actions
+ *   --shot <path>         PNG screenshot at this point in the sequence (repeatable)
  *   --size <WxH>          viewport, default 1280x800
  *   --port <n>            CDP port (default: ephemeral, picked from the OS)
  *   --brave <path>        browser binary (default: Brave on macOS, else $BLUTILS_BROWSER)
@@ -33,7 +34,7 @@
  */
 
 import { spawn } from 'node:child_process'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createServer } from 'node:net'
@@ -56,7 +57,8 @@ for (let i = 0; i < argv.length; i++) {
     case '--text': actions.push({ kind: 'text', arg: argv[++i] }); break
     case '--eval': actions.push({ kind: 'eval', arg: argv[++i] }); break
     case '--wait': actions.push({ kind: 'wait', arg: argv[++i] }); break
-    case '--shot': opts.shot = argv[++i]; break
+    case '--key': actions.push({ kind: 'key', arg: argv[++i] }); break
+    case '--shot': actions.push({ kind: 'shot', arg: argv[++i] }); break
     case '--settle': opts.settle = Number(argv[++i]); break
     case '--size': opts.size = argv[++i]; break
     case '--port': opts.port = Number(argv[++i]); break
@@ -145,6 +147,19 @@ const waitFor = (sel, ms = 5000) => `(async () => {
   return false;
 })()`
 
+// "Meta+k", "Escape", "?" → trusted key events to the focused element.
+// CDP modifiers bitmask: Alt=1, Ctrl=2, Meta/Command=4, Shift=8.
+const MODS = { Alt: 1, Control: 2, Meta: 4, Shift: 8 }
+const VK = { Enter: 13, Escape: 27, Tab: 9, Backspace: 8, ArrowUp: 38, ArrowDown: 40 }
+async function pressKey(cdp, combo) {
+  const parts = combo.split('+'), key = parts.pop()
+  const modifiers = parts.reduce((m, p) => m | (MODS[p] ?? 0), 0)
+  const text = key.length === 1 && !(modifiers & (MODS.Control | MODS.Meta)) ? key : undefined
+  const ev = { key, modifiers, windowsVirtualKeyCode: VK[key] ?? key.toUpperCase().charCodeAt(0) }
+  await cdp.send('Input.dispatchKeyEvent', { type: text ? 'keyDown' : 'rawKeyDown', text, ...ev })
+  await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', ...ev })
+}
+
 // ---- main ----------------------------------------------------------------
 let proc, profileDir
 async function main() {
@@ -174,7 +189,8 @@ async function main() {
     cdp.ws.addEventListener('message', h)
   })
   await cdp.send('Page.navigate', { url })
-  await Promise.race([loaded, sleep(15000)])
+  // unref'd so the 15 s fallback timer can't hold the process open after the run
+  await Promise.race([loaded, new Promise((r) => setTimeout(r, 15000).unref())])
   await sleep(opts.settle) // let Preact hydrate
 
   for (const act of actions) {
@@ -182,7 +198,14 @@ async function main() {
       const ok = await cdp.evaluate(waitFor(act.arg))
       if (!ok) throw new Error(`wait failed: selector "${act.arg}" never appeared`)
     } else if (act.kind === 'type') {
-      const eq = act.arg.indexOf('=')
+      // split at the first '=' outside [...] so attribute selectors work
+      let eq = -1
+      for (let j = 0, depth = 0; j < act.arg.length && eq < 0; j++) {
+        const c = act.arg[j]
+        depth += c === '[' ? 1 : c === ']' ? -1 : 0
+        if (c === '=' && !depth) eq = j
+      }
+      if (eq < 0) throw new Error(`--type needs <sel>=<text>, got "${act.arg}"`)
       const sel = act.arg.slice(0, eq), text = act.arg.slice(eq + 1)
       const r = await cdp.evaluate(setValue(sel, text))
       if (!r.ok) throw new Error(`type failed on "${sel}": ${r.reason}`)
@@ -200,14 +223,14 @@ async function main() {
     } else if (act.kind === 'eval') {
       const v = await cdp.evaluate(act.arg)
       console.log(`eval: ${JSON.stringify(v)}`)
+    } else if (act.kind === 'key') {
+      await pressKey(cdp, act.arg)
+      await sleep(opts.settle)
+    } else if (act.kind === 'shot') {
+      const r = await cdp.send('Page.captureScreenshot', { format: 'png' })
+      writeFileSync(act.arg, Buffer.from(r.data, 'base64'))
+      console.log(`shot: ${act.arg}`)
     }
-  }
-
-  if (opts.shot) {
-    const r = await cdp.send('Page.captureScreenshot', { format: 'png' })
-    const { writeFileSync } = await import('node:fs')
-    writeFileSync(opts.shot, Buffer.from(r.data, 'base64'))
-    console.log(`shot: ${opts.shot}`)
   }
 
   cdp.close()
