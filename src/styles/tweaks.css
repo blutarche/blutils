@@ -22,6 +22,18 @@
   box-shadow: var(--shadow-2);
   z-index: 60;
   font-family: var(--font);
+  /* Grows out of the status bar's tweaks segment, bottom right. */
+  transform-origin: bottom right;
+  animation: tweaks-in var(--t-base) var(--ease-out);
+}
+
+@keyframes tweaks-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tweaks-panel { animation: none; }
 }
 
 .tweaks-head {
