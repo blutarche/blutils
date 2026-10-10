@@ -37,6 +37,7 @@ coverage/
 # Project-internal
 .omc/
 .agentcontext/
+.verify/
 
 # Font source downloads (re-downloaded by scripts/subset-fonts.mjs;
 # only the subset outputs under public/fonts/ are committed)
